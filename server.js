@@ -5,7 +5,7 @@ const fs = require('fs').promises;
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Simple logging - only important events for dashboard
+// Simple logging
 const debugLogs = [];
 let systemState = {
     isPaused: false,
@@ -14,38 +14,22 @@ let systemState = {
     minFundsThreshold: 10000,
     activeUsers: 0,
     completedUsers: 0,
-    totalUsers: 0,
-    queuePosition: 0
+    totalUsers: 0
 };
 
 let processingInterval = null;
 
-// This function logs to console ONLY (for Render logs) - shows ALL API requests
-function consoleLog(userId, message, type = 'INFO') {
+function log(userId, message, important = true) {
     const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] [${type}] ${userId}: ${message}`);
-}
-
-// This function logs to dashboard (only important events)
-function dashboardLog(userId, message) {
-    const debugEntry = {
-        timestamp: new Date().toISOString(),
-        userId,
-        message: message
-    };
-
-    debugLogs.unshift(debugEntry);
-    if (debugLogs.length > 200) debugLogs.pop();
-}
-
-// Combined logging - console always shows, dashboard only for important events
-function log(userId, message, type = 'INFO', important = false) {
-    // Always show in console (Render logs)
-    consoleLog(userId, message, type);
+    const logEntry = { timestamp, userId, message };
     
-    // Only show in dashboard if important
+    // Always show in console
+    console.log(`[${timestamp}] ${userId}: ${message}`);
+    
+    // Only store important events for dashboard
     if (important) {
-        dashboardLog(userId, message);
+        debugLogs.unshift(logEntry);
+        if (debugLogs.length > 200) debugLogs.pop();
     }
 }
 
@@ -75,14 +59,12 @@ async function loadUserConfig() {
                 ...user,
                 jwtToken: null,
                 isActive: false,
-                spinCount: 0,
-                packsOpened: 0,
                 totalSpinsRun: 0,
                 totalPacksOpened: 0,
                 initialFunds: 0,
                 currentFunds: 0,
-                spinsRemainingInRound: 0,
-                spinsCompletedInRound: 0,
+                spinsThisRound: 0,
+                spinsDoneThisRound: 0,
                 lastError: null,
                 status: 'idle',
                 achievementsClaimed: 0,
@@ -92,18 +74,15 @@ async function loadUserConfig() {
         }
         
         systemState.totalUsers = users.length;
-        log('system', `✅ Loaded ${users.length} users`, 'INFO', true);
+        log('system', `Loaded ${users.length} users`);
     } catch (error) {
-        console.error('❌ Error loading user config:', error);
+        console.error('Error loading user config:', error);
         userData = {};
     }
 }
 
-// API request function with console logging only
+// API request function
 async function makeAPIRequest(url, method = 'GET', headers = {}, data = null, userId = 'system') {
-    const requestId = Math.random().toString(36).substring(7);
-    log(userId, `🌐 API ${method} ${url}`, 'API', false);
-    
     try {
         const response = await axios({
             method: method.toLowerCase(),
@@ -112,16 +91,12 @@ async function makeAPIRequest(url, method = 'GET', headers = {}, data = null, us
             data,
             timeout: 15000
         });
-        
-        log(userId, `✅ API Success ${method} ${url} (${response.status})`, 'API', false);
         return { success: true, data: response.data, status: response.status };
     } catch (error) {
-        log(userId, `❌ API Error ${method} ${url}: ${error.message}`, 'API_ERROR', false);
         return {
             success: false,
             error: error.message,
-            status: error.response?.status,
-            responseData: error.response?.data
+            status: error.response?.status
         };
     }
 }
@@ -131,9 +106,8 @@ async function refreshToken(userId) {
     const user = userData[userId];
     if (!user) return false;
     
-    user.status = 'refreshing';
-    log(userId, '🔄 Refreshing token...', 'REFRESH', true);
-
+    log(userId, 'Refreshing token...', false);
+    
     const result = await makeAPIRequest(
         CONFIG.BASE_URL_REF, 
         'POST', 
@@ -145,13 +119,13 @@ async function refreshToken(userId) {
     if (result.success && result.data.data?.jwt) {
         user.jwtToken = result.data.data.jwt;
         user.isActive = true;
-        log(userId, '✅ Token refreshed', 'REFRESH', true);
+        log(userId, 'Token refreshed');
         return true;
     } else {
         user.isActive = false;
         user.status = 'error';
-        user.lastError = `Token refresh failed`;
-        log(userId, '❌ Token refresh failed', 'ERROR', true);
+        user.lastError = 'Token refresh failed';
+        log(userId, 'Token refresh failed');
         return false;
     }
 }
@@ -161,12 +135,11 @@ async function claimAchievements(userId) {
     const user = userData[userId];
     if (!user || !user.jwtToken) return 0;
 
-    user.status = 'claiming';
     let totalClaimed = 0;
     const userAchievementsUrl = `${CONFIG.BASE_URL_ACH}/${user.userId}/user`;
     const headers = { 'x-user-jwt': user.jwtToken };
 
-    log(userId, '🎯 Checking achievements...', 'CLAIM', false);
+    log(userId, 'Checking achievements...', false);
 
     try {
         const achievementsResult = await makeAPIRequest(userAchievementsUrl, 'GET', headers, null, userId);
@@ -192,12 +165,9 @@ async function claimAchievements(userId) {
             }
         });
 
-        if (validIDs.length === 0) {
-            log(userId, 'ℹ️ No achievements to claim', 'CLAIM', false);
-            return 0;
-        }
+        if (validIDs.length === 0) return 0;
 
-        log(userId, `🎯 Found ${validIDs.length} achievements to claim`, 'CLAIM', true);
+        log(userId, `Found ${validIDs.length} achievements to claim`);
 
         for (const achievementId of validIDs) {
             const claimUrl = `${CONFIG.BASE_URL_ACH}/${achievementId}/claim/`;
@@ -212,13 +182,12 @@ async function claimAchievements(userId) {
 
         if (totalClaimed > 0) {
             user.achievementsClaimed += totalClaimed;
-            log(userId, `🎯 Claimed ${totalClaimed} achievements`, 'CLAIM', true);
+            log(userId, `Claimed ${totalClaimed} achievements`);
         }
         
         return totalClaimed;
 
     } catch (error) {
-        log(userId, `❌ Error in achievements: ${error.message}`, 'ERROR', true);
         return 0;
     }
 }
@@ -228,11 +197,10 @@ async function checkFunds(userId) {
     const user = userData[userId];
     if (!user || !user.jwtToken) return null;
 
-    user.status = 'checking';
     const fundsUrl = `${CONFIG.BASE_URL_MONEY}`;
     const headers = { 'x-user-jwt': user.jwtToken };
 
-    log(userId, '💰 Checking funds...', 'FUNDS', false);
+    log(userId, 'Checking funds...', false);
 
     const result = await makeAPIRequest(fundsUrl, 'GET', headers, null, userId);
     
@@ -242,7 +210,7 @@ async function checkFunds(userId) {
         
         if (user.initialFunds === 0) {
             user.initialFunds = silvercoins;
-            log(userId, `💰 Initial funds: ${silvercoins.toLocaleString()}`, 'FUNDS', true);
+            log(userId, `Initial funds: ${silcoins.toLocaleString()}`);
         }
         
         return silvercoins;
@@ -255,14 +223,15 @@ async function checkFunds(userId) {
     }
 }
 
-// Buy spin
-async function buySpin(userId) {
+// Buy and execute spin (together)
+async function buyAndSpin(userId) {
     const user = userData[userId];
     if (!user?.jwtToken) return false;
 
-    log(userId, '💎 Buying spin...', 'SPIN', false);
+    log(userId, 'Buying spin...', false);
 
-    const result = await makeAPIRequest(
+    // Buy spin
+    const buyResult = await makeAPIRequest(
         CONFIG.BASE_URL_BUY_SPIN,
         'POST',
         { 'x-user-jwt': user.jwtToken },
@@ -270,54 +239,19 @@ async function buySpin(userId) {
         userId
     );
 
-    if (result.success) {
-        log(userId, '✅ Spin purchased', 'SPIN', false);
-        return true;
-    } else if (result.status === 401) {
-        const refreshSuccess = await refreshToken(userId);
-        if (refreshSuccess) return await buySpin(userId);
+    if (!buyResult.success) {
+        if (buyResult.status === 401) {
+            const refreshSuccess = await refreshToken(userId);
+            if (refreshSuccess) return await buyAndSpin(userId);
+        }
+        log(userId, 'Spin purchase failed', true);
+        return false;
     }
-    log(userId, '❌ Spin purchase failed', 'ERROR', true);
-    return false;
-}
 
-// Open pack
-async function openPack(userId, packId) {
-    const user = userData[userId];
-    if (!user?.jwtToken) return false;
+    log(userId, 'Executing spin...', false);
 
-    log(userId, `📦 Opening pack: ${packId}...`, 'PACK', false);
-
-    const result = await makeAPIRequest(
-        CONFIG.BASE_URL_OPENPACK,
-        'POST',
-        { 'x-user-jwt': user.jwtToken },
-        { packId },
-        userId
-    );
-
-    if (result.success) {
-        user.packsOpened++;
-        user.totalPacksOpened++;
-        log(userId, `📦 Pack opened: ${packId}`, 'PACK', true);
-        await new Promise(resolve => setTimeout(resolve, 3000));
-        return true;
-    } else if (result.status === 401) {
-        const refreshSuccess = await refreshToken(userId);
-        if (refreshSuccess) return await openPack(userId, packId);
-    }
-    log(userId, `❌ Pack open failed: ${packId}`, 'ERROR', true);
-    return false;
-}
-
-// Execute spin
-async function executeSpin(userId) {
-    const user = userData[userId];
-    if (!user?.jwtToken) return null;
-
-    log(userId, '🎰 Executing spin...', 'SPIN', false);
-
-    const result = await makeAPIRequest(
+    // Execute spin
+    const spinResult = await makeAPIRequest(
         CONFIG.BASE_URL_SPIN,
         'POST',
         { 'x-user-jwt': user.jwtToken },
@@ -325,20 +259,21 @@ async function executeSpin(userId) {
         userId
     );
 
-    if (!result.success) {
-        if (result.status === 401) {
+    if (!spinResult.success) {
+        if (spinResult.status === 401) {
             const refreshSuccess = await refreshToken(userId);
-            if (refreshSuccess) return await executeSpin(userId);
+            if (refreshSuccess) return await buyAndSpin(userId);
         }
-        log(userId, '❌ Spin failed', 'ERROR', true);
-        return null;
+        log(userId, 'Spin failed', true);
+        return false;
     }
 
-    const spinData = result.data.data;
+    const spinData = spinResult.data.data;
     const resultId = spinData.id;
     user.totalSpinsRun++;
-    user.spinsCompletedInRound++;
+    user.spinsDoneThisRound++;
 
+    // Prize mapping
     const prizeMap = {
         11755: '5,000 Spraycoins',
         11750: 'Standard Box 2025',
@@ -351,85 +286,79 @@ async function executeSpin(userId) {
         11751: '1,000 Spraycoins',
     };
 
-    const prizeName = prizeMap[resultId] || `ID = ${resultId}`;
-    log(userId, `🎰 Spin result: ${prizeName}`, 'SPIN', false);
+    const prizeName = prizeMap[resultId] || `ID ${resultId}`;
+    log(userId, `Spin result: ${prizeName}`, false);
 
-    // Check if we got a pack
-    if ([11782, 11750, 11914, 11848].includes(resultId) && spinData.packs && spinData.packs.length > 0) {
+    // Check for pack
+    if ([11782, 11750, 11914, 11848].includes(resultId) && spinData.packs?.length > 0) {
         const packId = spinData.packs[0].id;
-        log(userId, `🎁 Got pack from spin!`, 'PACK', true);
-        await openPack(userId, packId);
-    }
-
-    return resultId;
-}
-
-// Initialize a new round for a user
-async function initializeUserRound(userId) {
-    const user = userData[userId];
-    if (!user || !user.isActive) return false;
-
-    const funds = await checkFunds(userId);
-    if (funds === null) return false;
-
-    if (funds < systemState.minFundsThreshold) {
-        user.status = 'completed';
-        user.endTime = new Date().toISOString();
-        systemState.completedUsers++;
-        log(userId, `✅ User completed (final funds: ${funds.toLocaleString()})`, 'COMPLETE', true);
+        log(userId, `Got pack from spin!`, true);
         
-        // Add next user from queue
-        addNextUserFromQueue();
-        return false;
+        // Open pack
+        const packResult = await makeAPIRequest(
+            CONFIG.BASE_URL_OPENPACK,
+            'POST',
+            { 'x-user-jwt': user.jwtToken },
+            { packId },
+            userId
+        );
+
+        if (packResult.success) {
+            user.totalPacksOpened++;
+            log(userId, `Pack opened: ${packId}`, true);
+            await new Promise(resolve => setTimeout(resolve, 3000));
+        }
     }
 
-    const spinsThisRound = Math.floor(funds / 1000);
-    user.spinsRemainingInRound = spinsThisRound;
-    user.spinsCompletedInRound = 0;
-    
-    log(userId, `🔄 New round: ${spinsThisRound} spins (funds: ${funds.toLocaleString()})`, 'ROUND', true);
     return true;
 }
 
-// Process a single spin for a user
-async function processUserSpin(userId) {
+// Process one user for their turn
+async function processUserTurn(userId) {
     const user = userData[userId];
-    if (!user || !user.isActive || systemState.isPaused) return false;
+    if (!user || !user.isActive || systemState.isPaused) return;
 
     try {
         user.status = 'spinning';
         systemState.activeUsers++;
+
+        // Buy and spin
+        const success = await buyAndSpin(userId);
         
-        const buySuccess = await buySpin(userId);
-        if (!buySuccess) {
-            user.lastError = 'Failed to buy spin';
-            systemState.activeUsers--;
-            return false;
+        if (success) {
+            user.spinsThisRound--;
+            
+            // If round complete, check achievements and funds
+            if (user.spinsThisRound <= 0) {
+                log(userId, 'Round complete, claiming achievements...', true);
+                await claimAchievements(userId);
+                
+                // Check funds for next round
+                const funds = await checkFunds(userId);
+                if (funds >= systemState.minFundsThreshold) {
+                    user.spinsThisRound = Math.floor(funds / 1000);
+                    user.spinsDoneThisRound = 0;
+                    log(userId, `New round: ${user.spinsThisRound} spins`, true);
+                } else {
+                    user.status = 'completed';
+                    user.endTime = new Date().toISOString();
+                    systemState.completedUsers++;
+                    log(userId, `User completed (final funds: ${funds?.toLocaleString() || 0})`, true);
+                    
+                    // Add next user from queue
+                    addNextUser();
+                }
+            }
+        } else {
+            user.lastError = 'Spin failed';
+            user.status = 'error';
         }
-        
-        const spinResult = await executeSpin(userId);
-        if (spinResult === null) {
-            user.lastError = 'Failed to execute spin';
-            systemState.activeUsers--;
-            return false;
-        }
-        
-        user.spinsRemainingInRound--;
+
         systemState.activeUsers--;
-        
-        // If round complete, claim achievements and start new round
-        if (user.spinsRemainingInRound <= 0) {
-            log(userId, `🏁 Round complete! Claiming achievements...`, 'ROUND', true);
-            await claimAchievements(userId);
-            await initializeUserRound(userId);
-        }
-        
-        return true;
-        
+
     } catch (error) {
         systemState.activeUsers--;
-        log(userId, `❌ Error in spin: ${error.message}`, 'ERROR', true);
-        return false;
+        log(userId, `Error: ${error.message}`, true);
     }
 }
 
@@ -438,10 +367,8 @@ function getRandomActiveUser() {
     const activeUsers = Object.keys(userData).filter(id => {
         const user = userData[id];
         return user.isActive && 
-               user.status !== 'completed' && 
-               user.status !== 'error' &&
-               user.status !== 'spinning' &&
-               user.spinsRemainingInRound > 0;
+               user.status === 'idle' && 
+               user.spinsThisRound > 0;
     });
     
     if (activeUsers.length === 0) return null;
@@ -451,7 +378,7 @@ function getRandomActiveUser() {
 }
 
 // Add next user from queue
-async function addNextUserFromQueue() {
+async function addNextUser() {
     if (userQueue.length === 0) return false;
     
     const nextUserId = userQueue.shift();
@@ -459,59 +386,50 @@ async function addNextUserFromQueue() {
     
     if (!user || !user.isActive) return false;
     
-    const roundStarted = await initializeUserRound(nextUserId);
-    
-    if (roundStarted) {
-        log(nextUserId, `➕ Added to active pool`, 'QUEUE', true);
+    // Initialize user
+    const funds = await checkFunds(nextUserId);
+    if (funds >= systemState.minFundsThreshold) {
+        user.spinsThisRound = Math.floor(funds / 1000);
+        user.spinsDoneThisRound = 0;
+        user.status = 'idle';
+        user.startTime = new Date().toISOString();
+        log(nextUserId, `Added to active pool - ${user.spinsThisRound} spins`, true);
         return true;
+    } else {
+        user.status = 'completed';
+        systemState.completedUsers++;
+        return false;
     }
-    
-    return false;
 }
 
-// Main processing function
-async function processNextBatch() {
+// Main loop
+async function processingLoop() {
     if (systemState.isPaused) return;
-    
-    // Get current spinning count
+
     const spinningCount = Object.values(userData).filter(u => u.status === 'spinning').length;
     
-    // Log current state
-    const activeWithSpins = Object.values(userData).filter(u => u.spinsRemainingInRound > 0).length;
-    log('system', `📊 State: ${spinningCount} spinning, ${activeWithSpins} ready, ${userQueue.length} in queue`, 'STATUS', false);
-    
-    // Start new spins if we have capacity
+    // Fill empty slots
     if (spinningCount < systemState.maxConcurrent) {
         const slotsToFill = systemState.maxConcurrent - spinningCount;
         
         for (let i = 0; i < slotsToFill; i++) {
             const nextUser = getRandomActiveUser();
-            if (!nextUser) {
-                // No active users with spins, try to add from queue
-                if (userQueue.length > 0) {
-                    await addNextUserFromQueue();
-                    // Try again after adding
-                    const newUser = getRandomActiveUser();
-                    if (newUser) {
-                        processUserSpin(newUser).catch(console.error);
-                    }
-                }
-                break;
+            if (nextUser) {
+                processUserTurn(nextUser);
+            } else if (userQueue.length > 0) {
+                await addNextUser();
             }
-            
-            // Process this user's spin
-            processUserSpin(nextUser).catch(console.error);
         }
     }
 }
 
-// Initialize all users
+// Initialize app
 async function initializeApp() {
     try {
-        log('system', '🚀 Initializing application...', 'INIT', true);
+        log('system', 'Initializing application...');
         await loadUserConfig();
         
-        log('system', '🔄 Refreshing tokens for all users...', 'INIT', true);
+        log('system', 'Refreshing tokens...');
         const userIds = Object.keys(userData);
         
         for (const userId of userIds) {
@@ -520,13 +438,12 @@ async function initializeApp() {
             await new Promise(resolve => setTimeout(resolve, 1000));
         }
         
-        // Build queue (random order)
+        // Random queue
         userQueue = userIds.sort(() => Math.random() - 0.5);
-        
-        log('system', `✅ System ready. ${userIds.length} users in queue.`, 'INIT', true);
+        log('system', `Ready. ${userIds.length} users in queue.`);
         
     } catch (error) {
-        console.error('❌ Initialization failed:', error);
+        console.error('Initialization failed:', error);
     }
 }
 
@@ -538,24 +455,24 @@ function startProcessing() {
     
     // Update settings
     if (global.pendingMaxConcurrent) {
-        systemState.maxConcurrent = parseInt(global.pendingMaxConcurrent) || 5;
-        systemState.spinDelay = parseFloat(global.pendingSpinDelay) || 7;
-        systemState.minFundsThreshold = parseInt(global.pendingMinFunds) || 10000;
+        systemState.maxConcurrent = parseInt(global.pendingMaxConcurrent);
+        systemState.spinDelay = parseFloat(global.pendingSpinDelay);
+        systemState.minFundsThreshold = parseInt(global.pendingMinFunds);
     }
     
     systemState.isPaused = false;
-    log('system', `▶️ Processing started (Max: ${systemState.maxConcurrent}, Delay: ${systemState.spinDelay}s, Min Funds: ${systemState.minFundsThreshold})`, 'START', true);
+    log('system', `Started (Max: ${systemState.maxConcurrent}, Delay: ${systemState.spinDelay}s, Min: ${systemState.minFundsThreshold})`);
     
-    // Add initial users from queue
+    // Add initial users
     for (let i = 0; i < systemState.maxConcurrent; i++) {
         if (userQueue.length > 0) {
-            addNextUserFromQueue();
+            addNextUser();
         }
     }
     
-    // Process immediately and repeatedly
-    processNextBatch();
-    processingInterval = setInterval(processNextBatch, 1000); // Check every second, but respect spinDelay between spins
+    // Run loop
+    processingLoop();
+    processingInterval = setInterval(processingLoop, systemState.spinDelay * 1000);
 }
 
 // Pause processing
@@ -565,7 +482,7 @@ function pauseProcessing() {
         clearInterval(processingInterval);
         processingInterval = null;
     }
-    log('system', '⏸️ Processing paused', 'PAUSE', true);
+    log('system', 'Paused');
 }
 
 // Update settings
@@ -573,7 +490,7 @@ function updateSettings(maxConcurrent, spinDelay, minFundsThreshold) {
     global.pendingMaxConcurrent = maxConcurrent;
     global.pendingSpinDelay = spinDelay;
     global.pendingMinFunds = minFundsThreshold;
-    log('system', `⚙️ Settings updated: Max=${maxConcurrent}, Delay=${spinDelay}s, Min Funds=${minFundsThreshold}`, 'SETTINGS', true);
+    log('system', `Settings updated: ${maxConcurrent}/${spinDelay}s/${minFundsThreshold}`);
 }
 
 // Safe user data for frontend
@@ -590,8 +507,8 @@ function safeUsersSnapshot() {
             totalPacksOpened: u.totalPacksOpened || 0,
             initialFunds: u.initialFunds || 0,
             currentFunds: u.currentFunds || 0,
-            spinsRemainingInRound: u.spinsRemainingInRound || 0,
-            spinsCompletedInRound: u.spinsCompletedInRound || 0,
+            spinsThisRound: u.spinsThisRound || 0,
+            spinsDoneThisRound: u.spinsDoneThisRound || 0,
             achievementsClaimed: u.achievementsClaimed || 0,
             lastError: u.lastError,
             status: u.status || 'idle',
@@ -628,12 +545,12 @@ app.post('/api/start', (req, res) => {
     const { maxConcurrent, spinDelay, minFundsThreshold } = req.body;
     if (maxConcurrent) updateSettings(maxConcurrent, spinDelay, minFundsThreshold);
     startProcessing();
-    res.json({ success: true, message: 'Processing started' });
+    res.json({ success: true });
 });
 
 app.post('/api/pause', (req, res) => {
     pauseProcessing();
-    res.json({ success: true, message: 'Processing paused' });
+    res.json({ success: true });
 });
 
 app.post('/api/user/:userId/refresh', async (req, res) => {
@@ -654,21 +571,20 @@ app.post('/api/reset', (req, res) => {
         user.status = 'idle';
         user.startTime = null;
         user.endTime = null;
-        user.spinsRemainingInRound = 0;
-        user.spinsCompletedInRound = 0;
+        user.spinsThisRound = 0;
+        user.spinsDoneThisRound = 0;
     }
     
     userQueue = Object.keys(userData).sort(() => Math.random() - 0.5);
     systemState.completedUsers = 0;
     systemState.isPaused = false;
     
-    log('system', `🔄 System reset. ${userQueue.length} users in queue.`, 'RESET', true);
-    res.json({ success: true, message: 'System reset' });
+    log('system', `Reset. ${userQueue.length} users in queue.`);
+    res.json({ success: true });
 });
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📊 Dashboard available at http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
     initializeApp();
 });

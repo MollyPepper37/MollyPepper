@@ -376,8 +376,8 @@
           <div class="user-card">
             <div class="user-head">
               <div style="display:flex; align-items:center; gap:8px;">
-                <h3>${id}</h3>
-                <span class="user-nick">${u.userNick ? `${id} - ${u.userNick}` : id}</span>
+                <h3>${id} - ${u.userNick}</h3>
+              <!--  <span class="user-nick">${u.userNick}</span>-->
 				
                 <span class="status-badge ${statusClass}">${u.status || 'idle'}</span>
               </div>

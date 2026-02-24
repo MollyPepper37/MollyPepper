@@ -1,123 +1,482 @@
 [
   {
-    "userId": "125065",
-    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoibVg2MU15d2VKWXlxS0dTOTRlWmV6Zz09OlZoTDVBMWE0TmRzaVEvTzhQcmRqeHY4cXdZUm4yekZ1cVM2TW1ES2pPc2lXL09MQ2ZlWnJ6N254aXV1di8ya1ZvZU42R29pR2xjVWtPMDJpeEtXTHBrNm15Znk3bzVOcUhUMmRUNHJ1YlJKRk5wcGFvQXZlbTJiVlZ6Tm1rTy9NbHBScmltT0FIMHFCMmhVa05YQnR0OGZoVy84a3p6a1FtcEw3NmU2Z3d4ZXNVRkwwVGZyeWxZazkzbEUyTWk4RXB1MUpOOWtWVEpJenpTUEN5a2lpZnc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc3MTU0MDYzOSwiaXNzIjoiZXBpY3MuZ2cifQ.WFSvej9iPykeXU-Tov8OpQikZaTx61W13smEzspk1jLSXe4PiyaryBT0ZRLYyrjT",
-    "userNick": "Zartez",
-    "dayStart": "6:04",
-    "dayEnd": "22:05",
-    "baseInterval": "31",
-    "randomScale1": "1",
-    "randomScale2": "7"
-  },
-{
-    "userId": "126311",
-    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoibldsQlZwRFBCQVN4TzNYK1QwemRFZz09OkpZQ3VCWFVNVUdMQkJEcTJEeWxaNXNXblB5RzVmY2JnOENoSURGcG9DSnQycW5IZ1E4aDIreTVEbzhLQjBqZEwzam1UQ0FUTWU1cm1OWlMyV2d2MTBPMGx2YkxKdGYxZWx3TmJUUVlXQUZ1cmZMSFRqdHlBelBQV1Jmc3JaU054dlUrdzg4SGFyRnZNQm4yTnNKR0tEYlpwTEczQ21BU29zd2FCVDl4SlFoVDdZNlpUMmVudENEdXN2bHFuYlZPajZhMXErVWtnZHhZcFdITHdYdzZzQWc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc3MTU0MDY4NSwiaXNzIjoiZXBpY3MuZ2cifQ.4R4vHAV38X_RJIJltnsIQXGkQa4rDtrAtziuxJHLbQ38vUgIZRKdAv9FXN-yapBs",
-    "userNick": "LordWjader891",
-    "dayStart": "5:25",
-    "dayEnd": "22:12",
-    "baseInterval": "30",
-    "randomScale1": "5",
-    "randomScale2": "18"
-  },
-  {
-    "userId": "129013",
-    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiYjF0T2tIYVBsUG5XZmxaN3BDV29YZz09OktwZmYreUpibVNNemRJUExrZFJJQkkvVHlGYWk1bC9idDQ3WXlaeW5XS3lLWFdmekRCRDRxcG5WSXNHWE1VQ0gvZ3diRGxDRFlaYVZKRXh1aVo4SERBVXc0QnllY2xzLzR6Rm85MTRvU3dzbWJQNmhYdzhLZkNqZUFGdWkvMTdnT0V6YXdJUmNlc2hRV1k5N0IvVkFObXlQWGljSTZISEp6N1o0RFB4QVYyNkxKcE1DaDBsSWVHZzZOVVV2UnZrRlQ4SnpXblRKZUpST3oyUWtpQTUyV29TZUxldHBmc2dzandWRHdJOWVHZkU9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzcxNTQwNzAzLCJpc3MiOiJlcGljcy5nZyJ9.WVsmMKkBTub-cvVHtvf812le409FtqbErHbcL_zJgpG-CauCfYWSKirRxyDH3t-u",
-    "userNick": "Fatalsnake",
-    "dayStart": "6:29",
-    "dayEnd": "22:30",
-    "baseInterval": "36",
-    "randomScale1": "2",
-    "randomScale2": "4"
-  },
-  {
-    "userId": "130902",
-    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiUHhWcUVYZnV1c1Rjd0tFWVJ2Z0l0QT09OjBSOFhLd0Rwdk1tdlQzSmRlT0VSVEY2ZVRTVEF3S0RtTy91R20yTVJzYWVnNzNlR1NuTWc3cUVsYXowWDk3czA5Skk2RkJqTE1ienpHZHV0YWNWbFdxakJFcFBudEtNTHcxYjhqSU9UTGljekMzM29TTG5jZTY0QW1uV2dQTEZieWl3TVUrRWJUUUsvUmduZ3RDNWZ2QlZ6Rk53RFBXckwwdGxYak9xd05CRktGY2J3WExpTGhxZVJuOG5pcnpQb3l4aGR4VTM3aEFIaENJZGhrbEw1TzZJMm9vY3Q0SDk3eTFTZmQxbU9sekE9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzcxNTQwNzExLCJpc3MiOiJlcGljcy5nZyJ9.uBRRzvbdIY5aseMSSOLrHMzDIGo5JaQibTyw7vxVcRSeTqAIhqQVI_F8sBxi0be8",
-    "userNick": "didizera",
-    "dayStart": "6:51",
-    "dayEnd": "23:30",
-    "baseInterval": "30",
-    "randomScale1": "4",
-    "randomScale2": "21"
-  },
-  {
-    "userId": "131227",
-    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiYmY5c1RJdm9pYld4QUJTUVRmcTllUT09Ok1CeE5PWjNJUDVGdHoyWUFNbTZGemlDRFRhQzdOTFpzVGY0NmtUK1grUWE0alo0T1hnVllDdGhSVng5d0hUeUw4Ly9oNDJDMkdOVVlqemdsWGp4T3N1SDgybVpwNndZRjlRVkxuTGFEaVhGeDBqdFNZeGtyTW1ubkgyL08rbzJJazNsSDQvckpyOW52QzZPUkdtVDFqU1VKWC9raE05YzhFOGtrWkhibEV5dmcxaXdMOGxLb1JUWkVETEllemxGUnFPaEZmUUVOcG1Vb2I5UWZadWtxMnBpQVloamJ3NGVQNVdEenlBZWRncjg9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzcxNTQwNzIxLCJpc3MiOiJlcGljcy5nZyJ9.gSOaXfT9E4tlwy7X7KYHF_sNAQIM6viMFHPz9XH4UKG1gpKa8rliFdgXSQJQZDxt",
-    "userNick": "Adail",
-    "dayStart": "4:59",
-    "dayEnd": "20:30",
-    "baseInterval": "31",
-    "randomScale1": "1",
-    "randomScale2": "9"
-  },
- 
-  {
-    "userId": "134754",
-    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiNGJmOEVVbDE1aUlyeDJKSzM2dTA1QT09Omg0TWhrd2hVOW9PSDFIWDFhcTFRckI3UllxM1lna1c3Z2wyS1JBTnlrRVl2RDNIeG8ybUh3c1Buck5lUUZCa0s4d3JId3p2eUdIQ1h6THE4bTRFQnNDUHhCUWdQd0ptclZ2NUJZN2wxVFA2NDhVSEx6akM4L251RWF6ay9kTTJlczY2aXIzUk1FbEJRR1BPdGRkVWE1aXZobUppRWVmTEZ6SSt0cFJKMmFJbHFVS2tySm5NSmUxRW0zQklhNXg5M2F4bmpUWTFwQlFKQWUyT2lUd29ZNmc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc3MTU0MDc5MCwiaXNzIjoiZXBpY3MuZ2cifQ.-3b3RiL8yomIxTKT7TRby6_KpZScd5o3p4EE7Tz7M0o4Wj6qohNH3mMNFeDMLpJA",
-    "userNick": "Kropuch",
-    "dayStart": "6:08",
-    "dayEnd": "21:52",
-    "baseInterval": "36",
-    "randomScale1": "0",
-    "randomScale2": "11"
-  },
-  {
-    "userId": "134872",
-    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiRUJMbnpKME5jbWJtWituWjVKNS8zQT09OnBVTWVNQzBsT3Myb2JQSGtjdmxUTlQ2N3l5V2l5M2ZtSURoVHcyRVpYUFc5bU5jekcremRyL3dCYW1NRHUycyt2SGdvWUZvRXhrejQxNkIzbDEzVStqV0UxWm5HWXd1aU41czVGY3BnWnNrS1htV2Q3bXhIdXdta1c3Yis5VERzMVlBT2JJSW0wWTY1bDN5OFR3TlV0dUVuYlAzTU4wRzZmczQ2azZYK1o5R3lGTUM5TGlEUXVKYTBhT1NNR3lMN2xoTWJ0WWlyQTU5N1ZZSUdCcXJzWE1HTkcwZm13WkUzUjdleGRmek1lSjA9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzcxNTQwNzk3LCJpc3MiOiJlcGljcy5nZyJ9.ukhzXJ3XRRcoXnoCJ7oofgT_C1oaAXCvE_0I_beDEEEsz_zA6ND67GNdo5kqForK",
-    "userNick": "vuxt",
-    "dayStart": "5:23",
-    "dayEnd": "20:40",
-    "baseInterval": "34",
-    "randomScale1": "1",
-    "randomScale2": "21"
-  },
-  {
-    "userId": "135054",
-    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiYWMrVVMxcGs5S0xCSVByTXBaWXVBUT09OnBRTE5OdGF5ZG9vcGNndVR4ZHhPeGwyZENyK2NsbTk5UERFVjJLd3dZeFZUTjI2NThSS3RWN3ZOWVBHaTliU04za2RRaXNxaGdhZTZ0RWR0c2p0dk9VUFpoQVJjaUthaEhXc0dwY29rV0F3Wi9hNXMvUC9MYnlUMis0WkRXeUZ1eGFwNXh0UDQ0Wm1maitJK3ZXSStHczNxMzY5QW9Sc3A2a0Z6dHFkK0s0Y0N5OW1WTEh1dGhZZzlHUWF2N2I3Z0l1UklFS3k4cmRpRjFqcGRFVDBreFNQWkIwT0Z4MU45c1BWNkNTYksycjQ9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzcxNTQwODA4LCJpc3MiOiJlcGljcy5nZyJ9.NkR4CzS4FFRDetuVwNKbkgD14FTyXvFk88SYt6vYemJd0XyprIHjZmgjNjeWjaUf",
-    "userNick": "SaGim",
-    "dayStart": "5:57",
-    "dayEnd": "20:06",
-    "baseInterval": "33",
-    "randomScale1": "1",
-    "randomScale2": "20"
-  },
-  {
-    "userId": "135232",
-    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiT2I5WGxqU3hpVm9KVEF6MURCRW1GZz09OnFZNkk0N3hMZmxQUDgybytYM0haaFJwYVNMem5iK28vcGgzdnlwQUZXVXRRTVNXblBUZFpnRVQ0SEtOL3RyQnFpT3VwMjV0Z29YRWc2Rkd5SmtwamhQcUJxazVyTEk2VGo2dFJ0VmpPWDlWZVpKa1V0UGpkVnd6K1V1OXlzOGhuOXJZVkwxN3U5Uis4cSswNXRGYm1SSEY5d2Zrb0lIbko4bnoyNTIzajRDRElIRFpMWkxhT2xDUlJ4cTJmRU9vNnU1MHVzdHN5RVFNRDNRelZzVDU2RVEvaXluZGo3enNjUCtaRnorTStMaEE9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzcxNTQwODE5LCJpc3MiOiJlcGljcy5nZyJ9.oSeiMMQ_5gTEYB9qtnHWUGK_p749-4LtBAktq_zZ6o6guYEn2DNDDxaX09mrtg1M",
-    "userNick": "moonsund",
-    "dayStart": "7:13",
-    "dayEnd": "22:11",
-    "baseInterval": "36",
-    "randomScale1": "3",
-    "randomScale2": "7"
-  },
-  {
-    "userId": "135459",
-    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiVmE1R3ZUM0wwcVd3S0VITFkxTVMzdz09OmROQ2p4MElUWDRFSlRlV1ZhSUdwOWNldS84czVrRTQyV08yeTh5SGF5YTRQQXhSS3BHYXlDWlBYamZzSnpOek9yUmFEV3k5bEJTUHJiamlGbXFpWFJTQURvV3ZFdDVXajBNaGU5ckZyK2Vpc2VlSklSTnlxdkNOZXV5RTlsRFE3eXNXWGZ5RVlDQUJMZmRHZ1hhYVdLQjU0b2pWREg0bWsvSzl1Z21weEtSRkdEZlg5b2M3OGlSMkhva0MyZk5Ob3VvbEs4RG9HN0V1aTBrVTAxVGVwTG5MeXNJL09BbUU2Rm00VjBOQ0huNlk9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzcxNTQwODI4LCJpc3MiOiJlcGljcy5nZyJ9.uuUQb8Hb9E397wzMOdlyqUSVpoyJa1AW2XpoN29XXAMcLMrFU2pWkFS4VUNclOtk",
-    "userNick": "Nooiz",
-    "dayStart": "5:50",
-    "dayEnd": "22:37",
+    "userId": "346986",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiSVl1eXMydnRBQTlvbE8zQ1ZGVG9Udz09OjdLRVJpbVlXaTIvdi9uZ1d6ZVJ1eDA0eUI4OU5VenlVa25Rem1wUWp3YVp5YVdzN1BKSVVHdXB0d0VnUVJobnhaS1AyQ0VZQ0NTb1BsOTdmaFZWMURNbWVxTDRKNkYyRkNZMENGa3BsWFpYV05ucHBsd0ZVaTlPTnFmcnZqZUtMcUliejNaZkRLcE41L3pUUzBsVE1HRTZSekxWSFFFYUd2bXVjU1RmeGxvUFVreG5pY1dKRkxia0srWWhOR3RuWXlaa09FdFdtV1Y1dldGNTYwRHFHdjVua0MzL0NZaVRVN0tFL3JpTVg4aEU9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzY3MDk3MTQ3LCJpc3MiOiJlcGljcy5nZyJ9.q2Mcp0HvkO0W0hYdByEb1WtjHgVdu0fRhSRP0ytIUDjHvQ63btYEAdYHGr4k-mHG",
+    "userNick": "ejdybjvt4",
+    "dayStart": "12:01",
+    "dayEnd": "3:55",
     "baseInterval": "37",
     "randomScale1": "2",
     "randomScale2": "21"
   },
   {
-    "userId": "136146",
-    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoielVVMVNtT1k0bXZFWW85dmpRRG4vUT09OkhRZjltWHZRUjBKL1g1RDhnenptQXFPdlJMR1dNS3B1RExIeEplUTNvNDN2NVRkVDAxMk0vRGZJdCsvWDdiRldIelJxOURYVUlQZ1JJNEZFTVAza3ZBTGpTdzVHSmlBa3hhMytiTTR3cXJmSGxvTC9kMU82NFBMUURXdDZGajAyV3Nyc2d2Q01iUTVYS2xscE9SZEd2T0xwRTJmb0twMFFaQUNRVHJMcllBbkI5QUtkaDFBa0pmZ1k1Q0FmNWYrR1luMzh2UlJRVVNHa05GeEwvU29yZ0s3enFnSEJPaE9DQWVST20wNTNRN1E9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzcxNTQwODM3LCJpc3MiOiJlcGljcy5nZyJ9.OyA1Z5fOHpHvwcWtmBJPzLgvGH_chTlX2rYu2bouMr68sbkvfjFVoFeJdDvaQFe1",
-    "userNick": "ADG123_",
-    "dayStart": "11:20",
-    "dayEnd": "3:52",
+    "userId": "348431",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiS3VOeVNGeU5aWWFDaGYvTlc3TXpDdz09Om92WHo2aUFDWjJPZ0tNcUQxMENWU0NiTE1Ea2NZb0pRZ2lWUmdSbFo5L2FWU0NGQXIwdTlCUWJUeUtRY1NMd3JNQ1A4NXk5QUNhUi9oK0dTM05TQ2Y0NktRNFJ4VDdNT3ExdmcyWVY1OFRRelYwdFVlaTkrSzlIbWdKMzBBSkNkTmY3dFRFZm4vMTUwczUzWGtmeEdnem4wVHdQa0JsTVU4ckRraDg2bDloM3ozUU9LRG9zMk1ycktwV3NJeFB2TXVjbGlXTEJpbzgraVhDK091Mm5ya0xIYURReWl4QW4wN00za2pYNUsyMjQ9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzY3MDk3MTM2LCJpc3MiOiJlcGljcy5nZyJ9.DMrq6dJXTRrduyYCnQ2mKrAJhdVPYIU-gzDTzTz9NA1rdBhw6U7RQ1XN8LRXbmn0",
+    "userNick": "Argle",
+    "dayStart": "7:47",
+    "dayEnd": "22:39",
     "baseInterval": "34",
-    "randomScale1": "1",
+    "randomScale1": "0",
+    "randomScale2": "20"
+  },
+  {
+    "userId": "352842",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiWnVzVnB0eU1oUTdDR1YrNExySUcwQT09Olo0cW1wZ3ZXWWgxei84MDNRSHkreWZDS2NVWkZnb2hOLzBOaXBRZ1FINGxHdkh2QjhzTWIzd013Q2p2azlvZFkvWGtEcUFZQUJDNlMxOG4zaXM3N1FEVlIyblJYTGcxU1NxOHZXYWM2bkIyRXJycjhIZkRmWnRpcGhrTTJRSHhHWTdBTm1rR25DeGFEdittczRrbkRWc0wvakdNL2wxM1lCb1NheTRyc3dMOXIrV1hxU1F0bS9idUEvSWw3eVVrT2ZmTElxdmNOR09IK3NjR1JTTFVsUFE9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NzEyMiwiaXNzIjoiZXBpY3MuZ2cifQ.Rb-9voznXWScOS5bwflfh3DWM2mAX_DTqR5XDcZc-9Awyy301PeRpXci9m1Q0G9J",
+    "userNick": "aganesik1",
+    "dayStart": "12:21",
+    "dayEnd": "3:15",
+    "baseInterval": "35",
+    "randomScale1": "3",
+    "randomScale2": "19"
+  },
+  {
+    "userId": "353634",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiTHcwY0lTdmRFRUZJcUpSSHhIWXl0Zz09OkUvNVptQlY4S0tvTThBRU85VHBubUNnTkN4ZU84RWVpaHlyZ0hlVHNjS1RJZHMyOXRqV0N1YVkzZlBIemVMOXNWM1dHV1h6V3ZCVlVZYno2V3JCaThWOUJaSlJPZmF3a3JaTFRxTlFwcTVCK3E3ZUdOeVN2dU92aFlFSTNUWHZrUzJ0am5DT3A1ZlZlRVJXODdraXZUTkRhVFVGK056cnE1TTBCMXJGMUFhcDRUM3FUNkJsRnQvSHIrUmlMWTUrdktTbHByOUhsWE9JaDNpN2I3M2swbXc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NzExMCwiaXNzIjoiZXBpY3MuZ2cifQ.WWtsd7HU0NuN-rUlxgrVMbX9QfUR0x_lliggVWLZAKFO4eMgYVbjaecwalXlJYu8",
+    "userNick": "Gagik",
+    "dayStart": "21:51",
+    "dayEnd": "14:22",
+    "baseInterval": "33",
+    "randomScale1": "3",
+    "randomScale2": "11"
+  },
+  {
+    "userId": "354192",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoibWs4d0prNmcyTUlpclhHM09ibEdYZz09OkIrYUxoVFJwTGsxMVljYkFJUjlia1JyeExtREtxT2NjRHJVTytnb1M3RUlJVGNhZ05NU0FDN3hZK1hhVUxEbmZ4Z0lwOHJFMTRDVHZMUnFDazhGeVh3ckpBYWFSRlNBRnRPVEhIVWY0ZnNaa2pMc25COXBpdGs5Q1ZaT2xjV0FzUjBzYTh4QS93enVoS2dHR2ZFaUozb2IzUDZDVWRMVER1ZS9NV1dBSVlTd29pNm5nYWVIVjJRUU5XMENGZnhZSCt1UGRlS3BQaGRoN2xWdktZd0FxNlkrRkl2S1N3QU8wRXhHVnZwU2F4V3M9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzY3MDk3MDk4LCJpc3MiOiJlcGljcy5nZyJ9.ofc2fRTtT8kfdtGCfF6sZNJRBLe_glQJO6heENqSZweK5MktjnZ4ED_Tot21kt4r",
+    "userNick": "LuckMuff",
+    "dayStart": "21:58",
+    "dayEnd": "12:47",
+    "baseInterval": "37",
+    "randomScale1": "2",
+    "randomScale2": "20"
+  },
+  {
+    "userId": "354369",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiSmJJNWhMbXVRWEQxL3BmR2JCQXZUdz09Omk5Tk9hT2ZwTXBRVXRLK1FuaWRkUE02aitWRnRBdk50eHFJN0htcWxtVjdNekF5VFhWSUlETDk2d2FsRkZHYjJvZmNwemI1blJRZnpRVmlyZmRHZ1pTQ3ZBaDFnNXZYSGU5VmduOVRkMi80VzFBUmswaTVvQ3NrUVd1eDZ3ajh0UzV1SG9TcldZOEJmcXZlUUpjZjVjV2hJazR1RGZRWkllck1kTW0wb05TTlJ3M09WZUQ0eVJkVFVOaUN3djhXTVoxSlY5ZElvd29LZWt3N3lkVUltYUE9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NzA4NCwiaXNzIjoiZXBpY3MuZ2cifQ.KXQzVGTw9PPxdhP__rDE48kaVZF-lyPlJX45Jz_ygOONSc7RvKZw8SjaV-XE3mSa",
+    "userNick": "lliriK2228",
+    "dayStart": "14:19",
+    "dayEnd": "4:54",
+    "baseInterval": "35",
+    "randomScale1": "3",
+    "randomScale2": "8"
+  },
+  {
+    "userId": "354550",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiQTVySVd0Wk1KZDRwVnZ6K0JXaTZXQT09OkNJaFUxSWhHdE5uaUpQMG8xMTR6NktzQ1VZbU1SYmlaSjFuKzl5UGpIYmlWa3JIRy9jRzVreTVuNURucTVxTTZoV0pLQWtvSjd6ZXUyZXlSR3ladHgxVTBtWFdaMmtwcGt0a0RlUm14UU11dHd0aDNpdS9yaU83dWdvTFRUQkVETWJ4TW1qalVLYzVscGpuZVNQZFJkdjZZYldJZWVRQmt2LzBJa1V3TlRtbGNtZjhiaFM5Y291eWhvTElhYll6WnBOU3B2MlZUakpaemt1cVU5RVVFTHlBa25JNUpVMkdoZUsrNTFlSGhscFk9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzY3MDk3MDc1LCJpc3MiOiJlcGljcy5nZyJ9.tCkzeoZIbsHVVpF5lPPEKseSVgafBSgQgAOHwTT2_VBvmBBfTB74uLZx79xBY3Di",
+    "userNick": "Kaiju47",
+    "dayStart": "23:30",
+    "dayEnd": "14:15",
+    "baseInterval": "32",
+    "randomScale1": "3",
+    "randomScale2": "10"
+  },
+  {
+    "userId": "354650",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoibjRPVUt4eVpEWVd2eGhUbEs5MkwwUT09OjljVm5zR3p4ZDV5TGJxcHYxb2Rualowa0pFM3diMGJZNC9YQi9VZ044T2docnVTVitPY0ZNZHNpQWVSTTJNWDZ5eitxQkxNaVlxNmFtUStrc0wyNE1TRG9OUW1SY0NuQkE1dUM5ekpZVDFJOWErNlpmRUtQK1BPWExoNmZoV0duSTY1ZVpkNEVHZnMyQ242V1ppWklyRUtTNitic1lCeHgzUi9YL3B6T0xqb3BDeTZDMWIwT3RYRzRQWjlNYkNQUXo5M3RTSThPUi9BRGdaT0ltcTNWa3c9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NzA1NCwiaXNzIjoiZXBpY3MuZ2cifQ.GzazbTJVoaU-5wJ_uP2LP8ytxgjEYB9wP19rzOHA2C5zr5yTe1tteiW4tW-Dj3-t",
+    "userNick": "duckduckdinosaur",
+    "dayStart": "7:07",
+    "dayEnd": "22:08",
+    "baseInterval": "37",
+    "randomScale1": "3",
     "randomScale2": "12"
   },
   {
-    "userId": "136211",
-    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiSG9lMFpFUmFPVnlGV1lweXRKS25uZz09OjdKY1M5WVVkK09WTGZDT0dVUk1acm5tTFlrZnRaR0EvakVZLzhVdnNiSmNGUm9HVG9Rc0NTeVRCZFE0ejJ1dEJXdDMwcUI5aXZXaUdtSEpXZGhqQUxIQmFFRXoyYUtXLys3N0RTVGxsc3dXd2JUZm9Tek9IVTZuOFV6c0h4VVF3Wm50S3V4aUpwVWlCQnRSMUlSOGF0OEVqblhVNlNSQWp1Qk41RVpGY0dndTFMa0NCdU1XRWlISUQ1STVKSkNrSHlaNXQyNG8yWkVPUlF1dlBIRnEvaGc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc3MTU0MDg0NywiaXNzIjoiZXBpY3MuZ2cifQ.FKoGmrhv3xoHZsOD7a3uM-fnK7KV5bWsZAesmh8zr6z9Oh12NKOPxJNNDnuFxtyc",
-    "userNick": "varolis1",
-    "dayStart": "14:20",
-    "dayEnd": "7:38",
+    "userId": "354670",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoieHo1RHZvMGllZ24zNHJaamxGc1cxZz09OnM1bUpaczBDU2p5bEpZSVpIaWVCSkd1cWVHNWlvZysyS0QrdHpMcGNVcHdXdXREUnZ5TWhkdEliZGZ3VHpvOG5ySnc2Sk15elY0bDB1bUJLL3Q5ckpqcFREeHBoSFF1b0R3NDNPMmtjTmJydFJHTUpuN3Y3bVE1Ui8zS05CcHo5RFZraFFncUVmQkwwR1JZNTM5cGVLem82c1NZUlkzK0I1bVI3b000ZHltLzFOc0lEOW1Wdm1pQithRWJ2eEg3RWk1dU9xblZMY2h5ZWlzTUZKamtrNnc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2ODQyMTE1NiwiaXNzIjoiZXBpY3MuZ2cifQ.8lPiKKIrQc48Yf2GCcHvudmgLgQkNZuJmYgUCcmRLJLlnMav0d7q_FV3GCwre_3o",
+    "userNick": "exposion",
+    "dayStart": "6:02",
+    "dayEnd": "21:15",
+    "baseInterval": "34",
+    "randomScale1": "3",
+    "randomScale2": "18"
+  },
+  {
+    "userId": "356128",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiTDI3UDFyR1JOVnYvTnYyRzgySWp6Zz09OklOd2pwRFdpYW1ESUxWV0NuZmloK3ArbHl0OWE2bXRFaFZBb2ltWTk2RVBzQ2xqUzBIdEFXODAwY2RvaDVhbC83Yjh5Mk9nc3dzOXZQOWwyTFE1d3paNmdrSHVkbEVRZnVmZ1pnU3Z2NzhGdDJWaCtKQWFHeFZySEMrVytqN3pRRVRtdFJDVDNzNmVGTUYrQnFtY0VvWHBIbnRLR2J3enRWUWVvUkRUbXNjNjF5Szc2YS90U3paTEJZbHB6MWhOZ1dNMXQyU0ptQ1ljY1NueXlRM09UbUJUWmxkcExYaFBGdElwcng0ZnJtS009IiwidmVyc2lvbiI6MSwiaWF0IjoxNzY3MDk3MDQ2LCJpc3MiOiJlcGljcy5nZyJ9.SLYnBx6prQa3RwNAR-9xUowMgHlrJ1_kNpvDufPFYyDqKHzXtsFnBXni9CefMrAr",
+    "userNick": "Addsy1",
+    "dayStart": "6:23",
+    "dayEnd": "22:32",
+    "baseInterval": "37",
+    "randomScale1": "2",
+    "randomScale2": "18"
+  },
+  {
+    "userId": "358385",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiVnA4RGthdmJPb1F2bkEzdUo1cFdzQT09OmV2TTBJL3phaWg4MzdtOFUzYmJ5VkxCdExIa1o4djFPbXFYb3dRU3FaNk5MUWVmeFJ1VWJwTWlLdDk2WWU0N3dWNC9BUC84b2pSYS9pUkdPREpVcmtBaDFVd2VPUUdncnFWRUIvVjBJc2tLNEl2bmN6aUVObXR4S3lFdVpWbW9HeXo3cGNPVHV1OFVkWm0vQlVBbzRkUzdyclVhL01GajdRVHFZTlV0cTlDTStPenYxWjIzU0twY0lOZUI2cU8rYURleTI0QlhsNG5iNG9CenlmVHNjUW1tRGxQaU5MOGhxU05KUGZ3eVF6c009IiwidmVyc2lvbiI6MSwiaWF0IjoxNzY3MDk3MDM2LCJpc3MiOiJlcGljcy5nZyJ9.wNOQ1GoliB0ZY5i47ztdt4l1ZUpaQiMLh1ZS4WgaOMl7IIAHPAE5qfQO4Kf4JNOC",
+    "userNick": "Tough93",
+    "dayStart": "23:50",
+    "dayEnd": "14:58",
+    "baseInterval": "35",
+    "randomScale1": "1",
+    "randomScale2": "7"
+  },
+  {
+    "userId": "382881",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiQWh5ekQ0UTV1ZktHSjAra2VXZUZ2QT09OlBpZVFWU1NKOFpCTCt2YXpRVkZidFkveDNVYXVEaUZzVGxPUkNXbWhOajBybWdkRmdnMmpIdjR3dmplSThlVkVxcEEzc1ZOWnlsRUlpN0pWWWo0SHNxWVUrN3lXWldDdUppaDJIeWhMb1Q5VE4ybHhJc2lzUEJPZjVNZVZtQThOL0dmZzluSGlUQmZsbWZUNHg5bFpBNENKYkQ3d0lRbk1NREtDcTVjdFlaMEhwUDMxNnZYWmRjWnF4OW5mdCtNdlIzQkJ0TjgwdzQyNHgyeFpNelR1UlE9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NjcyOSwiaXNzIjoiZXBpY3MuZ2cifQ.Gwdw23OOQJWXXVTUjhju2a5CEklrKgiszY_SR5of0nw_Z20W6q489mgyrExIKh0g",
+    "userNick": "Guiami64",
+    "dayStart": "21:07",
+    "dayEnd": "12:33",
+    "baseInterval": "32",
+    "randomScale1": "1",
+    "randomScale2": "21"
+  },
+  {
+    "userId": "383418",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiUGMzSmxIa2F1Y0FReHFiejRabjM4dz09OnByUmgwdUlZR3A4VFpoVmZpUzExZ2ppeUJMTE9KNGVrcVRXRmpoNUNMMlVZMzFnK0g1dk5NRnYrS2tMOWhobHJySWFHelVGRVNpMEh6UHFuNlVVVUZ0bStXb0I3WjZPMzFzR0s3dEphajNQZkY1Sk9ta0tZajFWOG1ZR0krSndmcTIyZ3UyVmVzM3NhY20yZmhQSTFyREp4dXMzbDNWU01ha0hNb1BaUDRLdyt1Q0wzWjNoczNNQnFTbU4xNlJ6Sm1Nck1pbDNGNkp1bGlaYk1qUkNrOXc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NjcxNywiaXNzIjoiZXBpY3MuZ2cifQ.pfkW0Rm_ZEHAgqDxZPOFYhpJ9HleZX2OYB-eiLrLMAEEJr-p1GFSWtWrUCtL7xX9",
+    "userNick": "Maomushi",
+    "dayStart": "13:39",
+    "dayEnd": "5:03",
+    "baseInterval": "37",
+    "randomScale1": "4",
+    "randomScale2": "18"
+  },
+  {
+    "userId": "390496",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiaFZtTG9rN2dmUFVwY2FhRUtpbkNrUT09OjQ4K3RYUVhqQ28ya2xaWUdkb1dWYTBEMmd4SVFjckhaeEJtKzRiRWJ6R1pTM3ZFMXIzajV3YWs2Uyt3RVRJVFVITis1czlmQkxhRnNtYlBXZ3JqSmxjTDVpY2RyeWMvcnEyTTNicFBvcCsrYUpOSWdiSlR3ZythamhqWHhsR1ptTUpWdFNJRExKSTJnWGsxR1hOeXRTZCs0TDdycFdhYnVjNXFRQk1DWWErNndZei92NjJKbzZWOUt5cU9UblZESzRMWjBnQnRmT1V2a1FxdGJTckhRS2c9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NjcxMCwiaXNzIjoiZXBpY3MuZ2cifQ.JTEW40r3B8GQPZOmK1a8gmaQNZle61amwzNLqHuBCnsOJZnwDmjIWPVTQ1lkdNVo",
+    "userNick": "VapeNarion22211",
+    "dayStart": "12:08",
+    "dayEnd": "4:07",
+    "baseInterval": "37",
+    "randomScale1": "3",
+    "randomScale2": "15"
+  },
+  {
+    "userId": "391555",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiVDBJcVNxdnNrVmFYWGcvbC9xV1hRUT09OmVvZmNnVEY5OUhmSmFOTUpUQnk2bFV0THBDeWdBTlYrZ0UvV3NUM2JOekpUUnlJdDc2c28wZCtpN0JZVnVQcngyVHY1SjRpS0ptVCtFcUY2eVd5bjU1QUhqNXVBZXVteEpQQlNSR1lOTEt5K2FSL2Z6Qkd2cnlqT1ZSdHpMYndLWHZqckNtMkg5bjhxb2h1MDQ2YXJtTzRVSWRwaUxzaTFHZk9OSGVRb3IvbUhLeE1XUGprZ3dLNG01UlJGYVlTKzlVb1JSS2pRQU5HWGhVNERwc2FJdnc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NjcwMCwiaXNzIjoiZXBpY3MuZ2cifQ.ti0EiYS-66fVFbJdMeAIC2h_bQXduR6id5vjz1UyrKgM3-3yG-pIIA35hzWaWMs4",
+    "userNick": "Ninja62",
+    "dayStart": "6:53",
+    "dayEnd": "22:40",
+    "baseInterval": "32",
+    "randomScale1": "1",
+    "randomScale2": "13"
+  },
+  {
+    "userId": "396370",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoibVRVRWI5eWVHVy96SjFUdnpYTlcwZz09OnpjaldBdkQ3Z3JKYzJTeUUyeTViMUU3S2lPdWlwcitPd3NuWVlmM0JxWk04M0d5bUJFcnZsV1A0YkFpQ0VOQ0RZalVHNXk1TzBsSU5UWVdnWjJDTXJOeHpYQzYvZlIrbXBvTU5EdXlrMUlqWUIzb1RVdjd5VTdqSUwrWHA1dWx5SDNsc05WS2VNejB1ZjRTVnFKcXIwUTRRc1d6SkxHd3lyUi9Iby9NTWpYRDltRTRoYVdUbURObHBXY0lFQ0x1azJSbjVNeDBxMGtIYmNLbzFuSGdLemc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NTY4NywiaXNzIjoiZXBpY3MuZ2cifQ.BPld_NmOfCeYPOrXzh_99zwUha7Krl4lajc_Q70c2ir6WjdNNi_0zM3mw_z_0E0_",
+    "userNick": "Bomb-Carring",
+    "dayStart": "12:54",
+    "dayEnd": "4:09",
+    "baseInterval": "38",
+    "randomScale1": "2",
+    "randomScale2": "18"
+  },
+  {
+    "userId": "396660",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiMytVbEs5amRkTmtBSm5hTkVmZnF6UT09OmJyeVJGeUtmRjRkQ3RIU2lHRW5hRDd6UnZ3ZHltYlVYbExsQVNTNWYzeEF3L3dNZDZLSUovclpzblgwYUxxc3Zzb2loMkxLY0d5MDdKNHBFbWRwUUxyekxUNURuRlk4RFRNTmFMOGpvVnNCd29idUpRY3ZseUJUeHFOcEdVby9lY3ZuQjd2cU1aUm8vYzgrU0l0TWFDVzZXTUo4YkZiclV5a0ZtQ25HazBlS3Qza2YrOCtIMG9GQ1JRQlVjWWZJRzNabmNobTR5Y1FJM2MvbTJ4QnJlWHc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NTY3NiwiaXNzIjoiZXBpY3MuZ2cifQ.hu8pAn1s6yuljg4UrenvXeHEgt-JBRyN5pBCOczdBF5uMk9BSl6AcDv36UguFdCd",
+    "userNick": "bemix",
+    "dayStart": "6:07",
+    "dayEnd": "20:56",
+    "baseInterval": "35",
+    "randomScale1": "2",
+    "randomScale2": "19"
+  },
+  {
+    "userId": "398201",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiSTlhekxEUGxaRFlYWXlpb1pUeW9IUT09OnRPVUN5aWlLbGFYNkJFbm1UdC9udkk4SXd6SU1BNzQ5c3ZVT1ZZcEpZYmg0RHhiVDBqSE9ZOXR1Y2t3Ry9UeTE4QnhIUmRmem9CVGkrOFJyOGIrVnFZWGNnMDBuWWdicjYyTXYxNnFUckFpMEt5alpyOVpWaStQVUl5b2k0MXZJMWgrYWRzK0I2ejc2aWQycFpveWpzbDJXcDBzZndCaHRSZElsaHNGYThUNThUZlhZK3VCOElGS2FnMDR3b00xRWlhT2dvNko0clkyWnBsQXZDV3RsbHl5MUxWekJrbzBlRngxYW1qREVRTzQ9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzY3MDk1NjY1LCJpc3MiOiJlcGljcy5nZyJ9.wn7gjIQ9FhgwOl_SkFdRNdcRJFmGUq_x4R4EsdzwQM5nIMS7Bp1QdBxU47MFcqZf",
+    "userNick": "RedTiger01",
+    "dayStart": "14:47",
+    "dayEnd": "5:59",
+    "baseInterval": "34",
+    "randomScale1": "4",
+    "randomScale2": "16"
+  },
+  {
+    "userId": "400282",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoib3JZUXord3pVUnhjYlBvNzVxcUlSQT09OlI1a2ZCcjFxMEcwMExNVjlKaTNKdUJzeGZhVFJPUUFDWEwraUt1V29EalE1SmxGSjFLcnlvamVxQkZrZGlGOUxFYlZZbnU5bzhPdUNkalYzQjIvR0RqK2ZDRkJaMXkxZ3hXb3Y1QXZITnBzME9vKzBCNEl4NHVTZTh2NU9Pb3VQM0djWFZwQlVEOWVtY0tpK0oySUNSekVQcDNqYmUrNndCdzhibmFKcE5ML0g5a1BVcGJZeG1MSnAxaDFNMngya0hRNFNKTFgwSDNMaGNFVUxSbDB4NFZhZ2w3cFhQNVBCeTdhWW9UUHIwVVU9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzY3MDk1NjUzLCJpc3MiOiJlcGljcy5nZyJ9.ML0rfU67fsdx6jZL1UdoQaYLzP9v6pk8z7DvY5u0Vo6_i4rZVNL8U2TeBUuiFIvT",
+    "userNick": "royik",
+    "dayStart": "23:34",
+    "dayEnd": "14:18",
+    "baseInterval": "36",
+    "randomScale1": "4",
+    "randomScale2": "7"
+  },
+  {
+    "userId": "400604",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiY2o5Y3gzNmdDTUJNNkhEOHpuaWdSUT09OitWSWs0anIzU0ZHRXZicTM2LzlmYjJVT3NGOFpzTW10ZmRGc3pQcmpVcitHL083cldGMTcvNFViUzA1K2xPV1VFdWdmd1dPcGhKcFhNaXV3R012VzlPWWdIM3ZaZENtekVEVGpLbGIyUlFPNUxHb1hqTzQ4RHlyRGJtbjN0eFNNK0VHenc2WWJrWnJLVE5yUWZxSlhyUktsWFZlUGFmQXMwNVpnb3liSEgvYXlmbTk4Yk0yT3IxUU02bXpQMmlJSVhESDcvZkRoL2Y0d2NMTWlzVGQwQUticVEzZ09zTmcvTy9uR2NlVzU1TlU9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzY4NDIxMjQwLCJpc3MiOiJlcGljcy5nZyJ9.-Vc_7UJqVXc-KkFkTOxgMlNitgPau4ESrZBMUXFupj0xCuK1SCLdufNRXnVsYjAl",
+    "userNick": "qw_cs",
+    "dayStart": "20:36",
+    "dayEnd": "12:12",
+    "baseInterval": "37",
+    "randomScale1": "3",
+    "randomScale2": "21"
+  },
+  {
+    "userId": "402758",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiaDc3eXlQU2JBTDFiMnVCM0tGandmZz09OkorQUErbkRScnZlZy8rZjQ2Mjl1QzUwSmp3SXFMZThwMldqQzBycVB6cjFOUzZCdEJ1bTFEZ2RmVFhjelpnYkN2TjExendzeHNDZHhYYkdFNWZyTE85aXovS1EvSENYc3RCbzRLYTArQmVlZENKTFQ4TUhzQkNJUDY3TXFCYkNpY3dNd2thRXYzZUxxT0RwZ0NVbnliV1J6U0Ivc1FiWUJHTUJ2OUhyR3R1T2dCa2E4L0VwVVZYUGZuSG5va3RDVTBwRmNHTFdOVFBmVEV4UDZBUXVVYmc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NTY0NCwiaXNzIjoiZXBpY3MuZ2cifQ.RXvXWyNu01lrpx3kAdSm0nkD5HuVRYVXBgZwP4gzd1sLPp5JKhqJUPAevYifBUuq",
+    "userNick": "Adarid",
+    "dayStart": "14:31",
+    "dayEnd": "4:58",
+    "baseInterval": "30",
+    "randomScale1": "2",
+    "randomScale2": "17"
+  },
+  {
+    "userId": "404094",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoibThZVmN1Z2JWZzQxeE1EUU5nQ2FVQT09Okd0TExrajh5TGFKWVgzUUpZS1pEWHJxclk5dE1Pc3cxeWp3dWJTakNKR2VUMUNORTBVMXh1UmRpK0pWeVZUK3lCbURhTjliNFFsTnAwOVg3TGZBV3czWUNPUjc5ZDdQeTZ2aGMvc0JmYmNuNEJmdUZBV1cyMVE0SmUrVkFZWU1neFYvY25sTk5jSXhNQVBIQXlLQnZmWm9ObTk3QTBtckZibWw2dCtjMWxOQVRWK2xKc2hxdzliNlZ3YXZjM21RK1JtWnlINkVaNStDMElJZy81N2xFOXc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NTYzNSwiaXNzIjoiZXBpY3MuZ2cifQ.l_NSUNAzc0X8tZg8aDvDilaeLkICp8i33-iXvKqDz0jr1Zhq_UJ-ovS-PfnxQbno",
+    "userNick": "FtorTiks",
+    "dayStart": "6:42",
+    "dayEnd": "22:40",
+    "baseInterval": "31",
+    "randomScale1": "0",
+    "randomScale2": "10"
+  },
+  {
+    "userId": "408268",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoibUY1TUR1cHhUb0QyTzdGZmRERldpZz09OlJDclZiT3FxTDlBZ3k0c3ZVVzR5NzVNN2wvbEo3V3J0bFA3Mk9DenJUQU9WazlablBHSDRiZ1R6QmIwYlN0V0FPa0VWOHM5ZGdzT2ZRSXU3dU9najVuM2gwUTIwOWFEWHdQRitIWlV3WFlJcHA1UUdWdGQ4a3hKZXpESVJJd01MWG9iOUNmWkVSWEVnbENjblJNcmxNbXVlTHgvSHpHODc2T3E4cUJKSnJjZWV5NjF6Z1ZERDB2bHdDTThObC9jWEl3R2ErUlVUVnpwdHZOZS84UGhrL2c9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NTYyNCwiaXNzIjoiZXBpY3MuZ2cifQ.Ip3Ul0BWHbPOr5ygMjUxSEDeq1pfUftHmD7CFB5-CsMtfuhkRnPHbUqa1RCEAAde",
+    "userNick": "f1reball6",
+    "dayStart": "12:58",
+    "dayEnd": "4:28",
+    "baseInterval": "38",
+    "randomScale1": "2",
+    "randomScale2": "13"
+  },
+  {
+    "userId": "411600",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoicCtKRVZtRWxMb1BidG0vMjNjUmh5QT09OjJLbGw1SEJVMmNpSU8rV2xhV0hBZ2lTMDkxUVpYREJ5MWVDM0pTeGhab1VueUtWN01XSG1rZTBmMk5EMm44RldCOTVEQ0ozNG1LdDZRL25xMW10eG5pMSsyMnVXaWZNamtjNXRybzBqTllBMk8xUGVHODlHWDJ5ek9yaWUxYld1WEc1emwzZDE0MEcrUmhvYnJ5N0dhSmZveVE3SFRQWWp1eFYzYkIweXc4Rkt1enVpT3J4Rk9PaXhVOWtJeTNvaUxVRmxKZEs4eTFneDlKVnN2Q0NhQnc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NTYxMCwiaXNzIjoiZXBpY3MuZ2cifQ.cE17oF9i3NBIOHYVSq1-C5cMO3Z-9AjC4LQ5EgTtWJ5-1Q9IDGvI3LskTuTF1Zf7",
+    "userNick": "Kasaday",
+    "dayStart": "7:43",
+    "dayEnd": "22:22",
+    "baseInterval": "32",
+    "randomScale1": "0",
+    "randomScale2": "13"
+  },
+  {
+    "userId": "411777",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoia2ZxMXlzMy9sdmU4b0JMZ3RtMU1QQT09OkNPQzRkQ1BMYnR2L3FqbEttbDY5cFRBS1VzOHZQWFduZENjeGdzSFB4SWo4M0VxUnozNlpkb2dpODBKTGw5SGEvQ2M0Q0tiYnJZWm5QT0V2ZTVmTWwxQWJBMS9yeFlwL3dRVXZlalo3QWhaQmRsOHpiSldZYmNOcVJ6YVJJaStVWmYxTlZ4bVg0S3lNVkJYWHJMVE1XeW1zNEFuQTdiYysrVG1qVFkrU0t6L3hmc0hrYnhwQTh6ZFZwa05ORGM4cjh4Szk3OHBHUGdsSkIyVFJjOWRJaFhrWGlWSGZKbStoOE1rWCtHUmd2Zm89IiwidmVyc2lvbiI6MSwiaWF0IjoxNzY3MDk1NjAyLCJpc3MiOiJlcGljcy5nZyJ9.8kD43uOTggtVE77xLQFDw04sGgIrocRX98YLBpXQUknKfGK5a5XOqrvrRt8QrwXG",
+    "userNick": "sunny31",
+    "dayStart": "7:01",
+    "dayEnd": "22:42",
+    "baseInterval": "34",
+    "randomScale1": "2",
+    "randomScale2": "10"
+  },
+  {
+    "userId": "413929",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoidktFemU3MjlzK3paempIN3IwdnNIQT09OkRFZ25GZUlUN3VMeVZmZnRMZXJTTTI1Z3VxU25MZTRUdFYrRzFrbGhpVHdIVUNZV2xvbWo4NVRJVHlWVW51YWc1dzJBU3BlYzVtWEJGRTVPZHNjdWZ1M094RCs3clBQRDRnQ2pOQVhBSEE1Tk43YTBWcEl4N2JOMGpDT3BKM0hLczh3YVpnemk3aHI5MmFZd1VaclhHMmlVWW5kRVdpN09HTEEyNTZFWjd4VVFpSGduaU1COWJML2ZxYnJDSGk3TWNpc2hpOWcyRzlwTkpWQVNERVNsdXc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NTU4OCwiaXNzIjoiZXBpY3MuZ2cifQ.8KbPqrL4DucDSBjsrZnjNVUwui6iljfkbsyPxuo6KmcRrbqhrNj6oeiGlMIPNX03",
+    "userNick": "happycola",
+    "dayStart": "7:19",
+    "dayEnd": "22:48",
+    "baseInterval": "36",
+    "randomScale1": "0",
+    "randomScale2": "8"
+  },
+  {
+    "userId": "415930",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiWnVtU3JrSDlrOEs1TWVWblY5MzBBQT09OkxCWUx4RkhwK1N3UWhtSlhRVncyVjczSll3YkNSL1R4WC90Y2lwWFFQNVZUUDB0bTBma0x4WUI0YjI2WWZsL29vSXpBKytHa3JVRlJxbERxcFZuVjdkRnhxR0d2ZVpnR2VOMy9pcGZkbkFldlNUWFhBVnNkVnE0bElxWW1hVlZsRFp1WGtqUnlMWkVuYzJEWkc0aFFPQmRLM09NU2RMQzR0RVFobU4yVWVSY0NrUTJTNy80U3hWWjhVbHhEQ2dUNFY2WDZnNHFjWTRTWWFYNDV2b2NTejM1a2RlKzY4Z29CZnF1cW03NjV0R0U9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzY3MDk1NTc4LCJpc3MiOiJlcGljcy5nZyJ9.d5_qy_XfYB9r695rnli9sWKkyT46XacYWxEXSrnTOHhu--Vvt6pHYp7ATtnXzNx2",
+    "userNick": "gggffeg",
+    "dayStart": "6:33",
+    "dayEnd": "22:36",
+    "baseInterval": "36",
+    "randomScale1": "5",
+    "randomScale2": "6"
+  },
+  {
+    "userId": "416011",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiOXVYcE9rMEIyQ0JJWjJOdklRL094dz09Ois1ZlVnNHBlaThBMHA0YVhxV2pub3BBalZtTGhaVkpxdkwxZ3ZMVXNaVzh5Z201akhDMlgwVkxGQThpUUNPMGVDcG1wS1pJSWoxcGR0dTEyVkNQNkxwY0JSWjJndGh0aVM2K2dqOVhHWjA4ckZxVVFYcjd6cFE3eVFqdGc3RGp0T1NzZlMyeWxWV1hjYVV4TGtBQ3RrS0VrNzhvSTV3RUJEMUdSTnNxbVZQNHFKZC9GUGp6YWpkN1RkZ1NVTkVDRmltd2NMaVVMVVFaOVByVnYvVUV4V2c9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NTU2OCwiaXNzIjoiZXBpY3MuZ2cifQ.GGpLdXT7CYu-WtQAbq-ZpckhzuivXzs3gNsUHWVGxUd3dqrcO229KWDiBd8yJBRK",
+    "userNick": "Rx1tu",
+    "dayStart": "5:58",
+    "dayEnd": "21:24",
+    "baseInterval": "31",
+    "randomScale1": "3",
+    "randomScale2": "19"
+  },
+  {
+    "userId": "417226",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoidjVIcTFPcGlZT24rd1VTWXo0WndFZz09OkRGbWkvdHFIZFlOalJHQUcxM3JSd3dIeDZNSjR1bW4rRXBhTzQ2MGhBQ09YZHpWcGYzdkUybUR4cE5aaTdaMjdnVDY1T3A1MTNCWjMzNkx5N0t1aDd1M1ZUYlFJUHV3UWRlSHZmOEV5QmxtdURjV05uVUdFcnUzeUdvc0ZMK0pYMVhka0IyVEdJdjF2K0RNSmJHajZrT3J4N1A3SWZNcDd2VHExdzl2SnBGMHBCWHY0UzJBVTlBSE42eC9EMk52ejlZL2FHWVdUcnluL3dmQzI2RkFqczB2MkxrZEh0QldWYzlOZHJJSFdESnM9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzY3MDk1NTU2LCJpc3MiOiJlcGljcy5nZyJ9.IRDvnMYCh1YPO5cu6xqGSnGXlCPLSS568LzV4yTMtPIJfIb8W-DsgJgZatOqAO_5",
+    "userNick": "smiddy4fun",
+    "dayStart": "6:06",
+    "dayEnd": "20:51",
+    "baseInterval": "35",
+    "randomScale1": "5",
+    "randomScale2": "6"
+  },
+  {
+    "userId": "422463",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiV3Z2UUlSaktmU0hjaVZlZ21zRjZKdz09OkU0dytncHpsTGN6VFhsNS9sTlNXcks3NnF1Z21CM1l5K095U3JTL05xUDVZSHpJcUU1bmgyOGNqOURWdStrQjgvdTR1NDBKRUVzUXZNVm9UUTdjV2dSSTJ4bTlPSzhKdXRra3BuN2tIejA2bEhQRlZ6c1I2UjFKWWxXZ09mWkhXMXRuZFk0YWNCOHczcUN0NldoaWhOdXF0U3hndUJZVXY3SExnTFU5RnZad1pQLy9BaFlRTGw5VEg1WkVrLzdqdnBsS29sb0ZLTnNlTFptMERHNUx5ZHc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NTU0MiwiaXNzIjoiZXBpY3MuZ2cifQ.aEY2wxSYJTRcNYNA3qiP9oj3mj6DWJOJfEtZyUxoOdaUgpwOXlJRk3vPeG_6nEye",
+    "userNick": "horeungen",
+    "dayStart": "7:00",
+    "dayEnd": "21:39",
+    "baseInterval": "30",
+    "randomScale1": "1",
+    "randomScale2": "17"
+  },
+  {
+    "userId": "422574",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiclV3VDlXMXhJeVNZSVRXVUhjNWhYQT09OnlDWFhwUzJ0ZVZZYXJBK25INmpMNHFBSkgrUDc3aWRseHVGM0hiUm9mM1BNeXBxb0NjSjhieDNnZHdjRWhhZVJQcXBPQWpaQXZxVEZIODBJZ3JQKzZKUjRsRFNjTDJIUUxGQjBsekJnRmorY1BUT0NPTy9XTzlCVmswMjJVanpadHJmOTZ3ZlpKTjhhRzVRczk2Tk5IUmp0MUlrY0lIZjFBZm1TM0NIejRGUjNPVnhrWUJlNkg2d0NKTUhoSG5QWjVKdWduRVExaWltaytoMkpmUldPd0E9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NTUyOCwiaXNzIjoiZXBpY3MuZ2cifQ.GsEOZPBY4Y4-9Uqht5YdHlyRYQ9IpxidJdfSEnhYTbEoDjRX_pfkve4o0nZCso9n",
+    "userNick": "filipyugi",
+    "dayStart": "7:01",
+    "dayEnd": "21:03",
+    "baseInterval": "30",
+    "randomScale1": "5",
+    "randomScale2": "21"
+  },
+  {
+    "userId": "423000",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiTCtyWEt6MTJSdTJFcDNzdGlUaDhrQT09OnNXd0ZnOS9hbHZXMzV0TXBPbnFnTXFCSVhnYm1JSUNEVXQxZDN4elNtWlZXL3RNU1JSeVBZemw3MjdVVGxwWDEwc2F6S2xtMkFqM1lYc3pyZitPWEpvYW5aSldwRi9uMUZEQnpBQUpLSllIRkM0Zk1vK1lwS0thWWhOU0kzcU9abGV0a0NkdStNZkJYMGRFZi9rT3dMNm5WUnVZQ2xaK1Rkai9TUHBranNmeTI5QWt2bnlTOHU5NXIycCt4OTBzUSt5Qk51ZjArYUwxVTdoQlNnSEhOZU81MndJMGw2a2FIWHhkbUtsbXRZWTQ9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzY3MDk1NTE4LCJpc3MiOiJlcGljcy5nZyJ9.RTbP9R0VpOI1MacRMI4fC5f52MTUH9yqqTbhbS_nRrOzwLudflVzHyGL_Gb1cWE8",
+    "userNick": "Fredde9000",
+    "dayStart": "23:04",
+    "dayEnd": "14:21",
+    "baseInterval": "32",
+    "randomScale1": "1",
+    "randomScale2": "11"
+  },
+  {
+    "userId": "423656",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiMCtZdWFmeVh2SWdTYkVLTUFMZ253dz09OmtHOXJXSndlTjNGLzdjTE9iVytzZkR1SmM0bGp3dy9JZTNQbzN6ejRvbEE4STk4TFg4NEJGRHQ0T0piSkdKdDBIVlM0em1sVWxxVVRYV2NzeEljcDV6YUNIcTJHUHdlempZTnpnUGdnenlVaE9RNmJMMW01WXdKak9zYmNiZzhQOG55WFdTbitFUUdKZmc1MGYxSE5oanhoQlpEMUJBVjhMZ3BkR2x5dTlmOGt0dGNST1F4cVFDckFvbWgzMU5ZUTBtUXZkL2RJSjhxRmhJRTh4VHE0Z0E9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2ODQyMTI2NSwiaXNzIjoiZXBpY3MuZ2cifQ.zLXZCd18-7e6vmgQ8lijrq8AP9kfes4kk5HqEXrxLeghwGexQiiGYi2_D2_mrE8O",
+    "userNick": "myh8x",
+    "dayStart": "6:55",
+    "dayEnd": "21:44",
+    "baseInterval": "37",
+    "randomScale1": "2",
+    "randomScale2": "8"
+  },
+  {
+    "userId": "431034",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiYXJPNGRCTzByOTRadVlreWVJQ1hpQT09Omc0SVlSeVUzcmR5NUlydjUyZmNERjlid0M5OVlmWjJpY3dxWTZsTWtTVTNBSlk3SHF1b214WnVpMlVOK0d3Vnl1R0lKKytJM2I5YVRzQ2t2SWJ2Zk5INUViTFlHcmxseENNa3BxZzVSdlMwb2tJUFB3Qk1zd0VIMlRGM1d1cS9IUGR6WEhKQThSbnozRC9Cemg5cE1sRlBHQ1FXT2liOGxVbk9ISGFkNFA5aW5JMkZUcGhXc0M2VTZLemVtMVJiN0IrZVZZV1plSTdjbVVHWjFKTUJKb1E9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NTUwOCwiaXNzIjoiZXBpY3MuZ2cifQ.Ch_GxBYwBSvfYSVqUvn-xiR7CDU9jT5svn69sWAD8h7KLlNjoQmvmW6_WCY_GQTB",
+    "userNick": "adixx8",
+    "dayStart": "14:33",
+    "dayEnd": "4:38",
+    "baseInterval": "30",
+    "randomScale1": "0",
+    "randomScale2": "14"
+  },
+  {
+    "userId": "431274",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiYlJEN3daMmVOdjBzWWh4RjAyK21PQT09Okpabzc2emhJL0xKTXByS05FOE5kZTV3aUc2ZXAwZ1Q0S05IS0xVdUdYKzc0ekorejlKYk1RSk9MZGJsVlpucWs4blpyWXYwUnQ4OFJ3MXNtbUcyaC9xREhMR3FGQkFaL21IQjFQZWp3UlBYcVpCSWUzaEkwd0ZBbUp0RnM3eFltZDArR2k5VW90N1czKytsL1Z6M3VLcy9Qd2M0bUxxSGlQU2FiZXhJeW5NTmZYOFo4eURXMkp6UXdsOS81Rzh2bXBkdWhSYlJNZW1BN25LQWduaEwvWk5NakhBS3pBUmsvdk56QVVuQ2ZPcWc9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzY3MDk1NDk5LCJpc3MiOiJlcGljcy5nZyJ9.008bx3xNEkM0X0-h1aVuX_TMo_Bh0MgV5soXqX1uW15jJ5JEcY-XBXm3WoZIfYXb",
+    "userNick": "Stifter",
+    "dayStart": "6:15",
+    "dayEnd": "22:49",
+    "baseInterval": "35",
+    "randomScale1": "5",
+    "randomScale2": "10"
+  },
+  {
+    "userId": "434172",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiNCs1S1BVTkgrTU1Dd2lRMVNYNTVDUT09OlhLemRZdGFJZ3V4L3Qva2VzVk9oeHpDVEo3U2lLNytsMmowVzVhRE82UXB5SVlUcjM5K0pKMWtWZk5hNUd4VE4xWUYwSktjWG1SOWFNS0p6ZkRzRnd5ZlQ3RC9lZzc5WHA0dmVQUDJQU3JUZWwxWDBPbElSZG5zcFRKTDQzMDMyTDl5SVpsWWNNL1dlQSs3Z1A4bXloYzY4ZXh4QjBVNURDYmthamtrZGhIQjA3K3d4aVJiN0dtZng0QlJ3N2FPV2J0dExlM3o4blFQWndiSjJQZ2hpMmc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NTQ5MSwiaXNzIjoiZXBpY3MuZ2cifQ.HRTHhXg3-QYILXBfJn6gzigrYbh60TlIfPSI1KmibfyBGUmV-1Z7gt9NP2GymXFe",
+    "userNick": "krzysik",
+    "dayStart": "7:02",
+    "dayEnd": "21:20",
+    "baseInterval": "32",
+    "randomScale1": "2",
+    "randomScale2": "14"
+  },
+  {
+    "userId": "435311",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiMkkwREpGSDVHNlFNVzByNmlUa2daZz09OnFmOXBxbXREUlVtTlZ2c1VTWlJtbVhiejFMMVZKSE1Tc3dSNFJlK2tBT0FlZ3E1ZTdadm5hU0JXVGN6VUNCMTZsNnJLYW4rYlNRUDZ2UU9RTDBlUktXSmsxT0pHTlk2Z1JreFRMdXZHVVhET29nRnIwQ250ZDdkYUxjcTFuSHhLME5COGlLcC9aN0lSR2ErYTZXWWk3STl5dTVnQ2pNaDRCc3JjcUN1Z2ZUSldOd3lBODdIcmM5b3dXTmFnZjZBbkdWbUtXdGdpdGgyMHBWa2NaNytrUWc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NTQ3OCwiaXNzIjoiZXBpY3MuZ2cifQ.yCNlkOuYX9uHSTfWd4I0T7iGFVxU5A3voi9IEu8f6UgQxVN0_wLsU9AicA0EwHn5",
+    "userNick": "Zjarasko",
+    "dayStart": "6:50",
+    "dayEnd": "21:20",
+    "baseInterval": "31",
+    "randomScale1": "1",
+    "randomScale2": "17"
+  },
+  {
+    "userId": "435404",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiMCs2b3ZGbmx5WVNLOFFHVWlONW5OZz09OlQ0bkFFN1hrSnNaQmhEaVlYQW1EbHhmLzdkaHpadEFNNzljVEZVdGYwVGxDdUNHd1ZhZXJCakk0VnFYZTF2QUk3bExpYkF1c3JUZ1pKQmZjblU1dmdnN1V1R2NKL0hBVU1XTitBWmMrKzZmT1U0Uno1bzZWMEtBYklLcThHWEJwVzZOdG9jRE9GL1FoeVhCNkEzdlljYld4a0pZQm5XSi9FYWdTa21VUmtaR1pXZWUrVGdPeXBxdTdKRWhvQXpLNFRTZ3NCRjAzNk5RMFdieUNqbTY4Nnc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NTQ2OCwiaXNzIjoiZXBpY3MuZ2cifQ.yzUGCjAc-D_GRLuSgnZrqqCPbAt3S4e1WevvxE1zj2cXaj2ullGr0ACiWSCD31NZ",
+    "userNick": "aideneo",
+    "dayStart": "13:10",
+    "dayEnd": "4:26",
+    "baseInterval": "35",
+    "randomScale1": "1",
+    "randomScale2": "17"
+  },
+  {
+    "userId": "435664",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiTmZkQkpybVBGL01EK01aeEE0VGh6Zz09OjR4QlVqMWpNTHl1MExUc1dXYXZvS3AwRjFVOTNjSWd4eENlT2FMemExL2prd292MUU0OHdwcTNhYm5hRjZqa1dXQ1dtemloOFRtMERUZG92ck1mRldOYzNoNytST2NsTmpjbzY1bnZlWEJkR3FveEFyQkFGSzdnRWR6ZDgwZ2UySFV1Nkh1MmZ3Ny9JaTlzSVIyQnlxN1dOenRYYUhCTThhSzRDeExGbTdNVFdKaFNGMVI4bit2WlZkaVRqbDhaeXphdkJkZE52dzMwNWcreHBvb0FlbTJaM0syeE50UmFlOVJQeGhtdTZpU0U9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzY3MDk1NDYwLCJpc3MiOiJlcGljcy5nZyJ9.I89VuI5JHDRvC_ObCwkpg7GmOtGVnsykXRus0rlXUIG9pKnmr97jFfrHTVRPccf4",
+    "userNick": "illidanoo",
+    "dayStart": "7:03",
+    "dayEnd": "22:29",
+    "baseInterval": "37",
+    "randomScale1": "0",
+    "randomScale2": "16"
+  },
+  {
+    "userId": "437169",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiWENQdTJyWkV5MjRNZ2JBcStKOTVJUT09OnF5eDRXcnFzLzN1VDNZd1Nvb3ArK1FKOTVKZm5iUkdUaEU1OEU0Mmp3U2NIdlo2WUpsdVpsdUVaQlFDK3cwdkdaUEMvVVVuQ2JHT1g0eERzZWtuRnphVTAvMlE5YXQzSVV5WDRWVldpSEhNQVJJcWE2S1ppRU05VFE1M1pWMVorSGtEcWhsRHdzYnlmU1QzbEJEVFRUS1hoMi9YU2UyRmZlVmZySVBxdjhGYkhOTnluKzlzamovc0dmRGFoeFVJWUZHYWZlWldYL2VBelQ2eUpVeFltMGc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NTQ0OSwiaXNzIjoiZXBpY3MuZ2cifQ.TBUk1zmBwUKZE8s7z8NHjfsjUrQA3kMN0pdlpGhvPTKTbD0SZ8rtICBSyi5pbICq",
+    "userNick": "xalucarde",
+    "dayStart": "19:58",
+    "dayEnd": "14:31",
+    "baseInterval": "36",
+    "randomScale1": "0",
+    "randomScale2": "16"
+  },
+  {
+    "userId": "438215",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiZ2p5alNHN0xpYnFqWGlCcmlnZTBOQT09OnVTMkNaWWZpMThsa05DVy9NWW0vTlRMeHdIQ1o0WUVhR0tKZVJENnZDMjEzOVRnWnp6NWZyQUo4K05FeWxJNGJuRlo4WTFnWXdrcVlXMnlZRlVlYjJzUGlDVlc1RHhpMDkyRUVWTC9CMHBJNjRLTDhtYytub1Zjc1dYbERaelpaaHpjWkduRUFXanJUUDNyYXhhZ09FWkdZc1dONE1sU0g0VkhTdDJzTTN1SkdZN3hlcm9mS0wzejlJR3AzNHZzQW0yNXhiZmxqQlJ4SWFSaUFDVlNMU3c9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2ODQyMTI3NywiaXNzIjoiZXBpY3MuZ2cifQ.rjROYlT_qlOZU1-Om7YeexfEttc8ufX1VW3AnO_7iqvNUTHlhiTC3lJY3CjRjdW0",
+    "userNick": "Thexperiment",
+    "dayStart": "6:53",
+    "dayEnd": "20:20",
+    "baseInterval": "31",
+    "randomScale1": "2",
+    "randomScale2": "13"
+  },
+  {
+    "userId": "438803",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiZDJSWUVWSXovWlBZZVlkYXk1ZnRkUT09OjRBblpaR1JXUDA2MFlzMk9FRHgxMWQvSDZlUVlvdlV0ZHZLTHVjcy9PZlgzVEdrenFsRnZrZWtxUmdPM1JlT2szVUNoUjhaWUJEWmFYNTRRUGM0cVhQUGJ5eEU4MmFLekU0ZmRjQWg3c09oQ244MUdNVFg1OWJGV21jUll4TndUMmh6QkJjQk4wTlV4Lyt2ZlN3SDBFWFRXZ3MyV0JWNGM2Z2toWUJYeW5kcXN6bnFBRU9xMHJEUGdZRXJpd3RFQW9zVTdSZ1J1d1ZmZmFZZmR6eVJ1VFE9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NTQzOCwiaXNzIjoiZXBpY3MuZ2cifQ.JfETDmxA8n049f-WIp7j58rPfcxCU0tWIYuawd5UsnanuJEYLbhZ6UIyURgSFbdS",
+    "userNick": "epritv",
+    "dayStart": "5:37",
+    "dayEnd": "20:53",
+    "baseInterval": "31",
+    "randomScale1": "1",
+    "randomScale2": "10"
+  },
+  {
+    "userId": "443895",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiZHZnNS9BR1Y0M2lZRWJ1MXp6SE9HQT09Ojd6NlNRdmhqNnRIaUE2SWlNZjlTTkdvQzNMLzVRZ1Flcm92Q05DRzdqNmFad1hGSVhHNnpycHRKU1dHdk1nK2M5bmI2RnhBanJISGJZenpGQTZQTXp4SGZUVnJvNXJEaFhJTzduQUdjSTFGVDZueDNYb3VmQWVIUzNjaEsxWHZ1UzNBdmxGV2ZhTWVUZTBHYUdmckFRUEE0RWNQQTJnRkYvL2Y2WHg5bi9WSkJhQkdGTFlXSUZnUE5NWnlPbWpEeHNoQ05qbFRSK1ducFJnVCtCNk0xRTZwTjN1UXZvb0dSSGhhblJhc0dheGs9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzY3MDk1NDI2LCJpc3MiOiJlcGljcy5nZyJ9.eyy6E5rH2qz499Va7k5XBjEuA4l58fnSjESxuQimnJxVMEJ0ytKNHxulY_QG7WuX",
+    "userNick": "Exoninja",
+    "dayStart": "8:13",
+    "dayEnd": "23:41",
+    "baseInterval": "34",
+    "randomScale1": "3",
+    "randomScale2": "20"
+  },
+  {
+    "userId": "445494",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiZlVraGF2RGpGbDk4NGNGcjViVlRXUT09Om5GdnJHLzlvdlhrOHI1emNWK0JZSE05Wmd3bDBtZVpaR1Y2OGpnR3hoTFk2Yis2NGcvUDlXTFdLNTB2MWxKVUVDMnRCRFBWQ1lIVVN0bnd5b0haRU43UkZ6dnFRTTVDZm9XcnRPWDZtcEtoRVc1VTVGK01EVXJSNlpIeWFKVzM3d0FTN2xWeW5XcmtzS2NndmNuejRkODBQUFpZN29xMFM3Vldqd3IybmI0Q0lQaGZGRTU0Y0FZVnF5b0RrUnlYWDZyUnhSZEw2SUs2V0VSU0JYZmt2V2c9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NTQxNywiaXNzIjoiZXBpY3MuZ2cifQ.Z9fYHm87E6L3ArWqT1PTqDnG0QeoQoKtIjGPd8wFYocwBkWiiLfV_s5vg3tAJ4j2",
+    "userNick": "myxa_777",
+    "dayStart": "6:33",
+    "dayEnd": "22:45",
+    "baseInterval": "34",
+    "randomScale1": "1",
+    "randomScale2": "14"
+  },
+  {
+    "userId": "447731",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiWnBYK3JHVjBUK0pKWDgzQjVyRHU0UT09OmNIYzhGVTlxMGJEc0cwM0o3MGMyU1c4M2FRUzNidGI1ZjBZS1p6MG1SOEsxeFA2VTBCT3lDOGpIYTlkQm1jUG9HYlA0MFdqYnVQSDhoRmJFb2FDamg3bkQ0dk5uTHJkcDBYWTdreFJzT0NselZLU1dLZzFWTzBSZ3B0ZHFCaGorT05TTEs2dXk3QmY0eFpFaEcrdDBPQWRGeDBDUndoakwxOE02SzRDRmhkUmJGSEI5YjV5RVdOSmd2cFB2cUUwaUpQYmlmZmdsd1RZTGpHdHZpVTJSdEE9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NTQwMiwiaXNzIjoiZXBpY3MuZ2cifQ.vRGG6Bfv0XiHGhUrKAKF_zhwyNdMpbtP1CI0gjeRIp0BuZrDiOKbUK8YbWyxRKZ7",
+    "userNick": "olsinika",
+    "dayStart": "6:29",
+    "dayEnd": "22:30",
+    "baseInterval": "34",
+    "randomScale1": "0",
+    "randomScale2": "9"
+  },
+  {
+    "userId": "501469",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiUE12L1dXV1k5dUdBb0RLVlgwcTgrZz09OjVrSnhGbEdPZ0JSdFpoQ2Y5dGwwZHRwbVRXOTZpMUVJb21lOGc2enM1c2pqMmdJNDJpajJ2bHB0UC9ZRlY2amthaXZUTW5CQ2NBdUYzV1FvSEdpWlYrKy94K010YTUyNW1CV3d6TE5Bd2EvZ0ZudWtYUzNkbTRUaHR6OE5JU1k3WDZtZDAwQTZZMEdNd1hEMDJURVZPc2F5d0VZbFUwaVl6b2NrRnhPQ2VRWjZoRWNKWmx2WU1KZGYrQUJkVWFpNWhsT1BJY2pMeUUrNUQycEVzYmFLWmZ1Y0NPTFUxV2lTV1dlL28rTGtNY2c9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzQ5NTg1NjAyLCJpc3MiOiJlcGljcy5nZyJ9.RZrYWaK0kFLATpvYSqi3N-4WPpT4rwqazD6BafTa8xxgHDmYg8LLcaRF2k6DLWzM",
+    "userNick": "tan1ke",
+    "dayStart": "5:03",
+    "dayEnd": "20:36",
+    "baseInterval": "31",
+    "randomScale1": "1",
+    "randomScale2": "14"
+  },
+  {
+    "userId": "503651",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoicFVLUUtrdElRblJlWU9FdmxlS0pmUT09OlZUQjB0aDFqajdoWE51cVB1RXUvNWd4UlErcDNjNEE0NzBIVUNmY2RqQ2tGYm5KcUtmVWFoZFdoZ2dTZm1TZFlTclB6dXN0ZTFBdTRhSG9oZDB4SnMvdkN5TDUwRWpmclAveXowQlBSeWxrYm5VWWMyZXA3WFdpQXpWUHg5RXpHZkxON2ZXREtqdm5vMzArOTlyb2xYNFVENGU1eXZyS3pVS0lYOHJSdzVCYWFwZEJLbFN6endTSTdnVi9ZcFM3WmZWSVoxOWxKRVl1Y1lyWVZtNFlOV1QwcTFYTE5GK3ViMkFvWVFrK2x5M289IiwidmVyc2lvbiI6MSwiaWF0IjoxNzY3MDk1Mzg5LCJpc3MiOiJlcGljcy5nZyJ9.BNJsTwvIeoljLoZZ1SLy31Vyi5NZxutaTSjlNzrQaa_uhTuxIOFgaARZb4DacNqc",
+    "userNick": "dejandrito",
+    "dayStart": "6:55",
+    "dayEnd": "21:44",
+    "baseInterval": "33",
+    "randomScale1": "0",
+    "randomScale2": "21"
+  },
+  {
+    "userId": "508815",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiZXQ4TEF3Zk1aTXFYcHBmME1rR0R5UT09OmFjU1VBQXR2bU81UUxCU2hQb0RQMW5abnVZL1lyVDZadHhqUGlKUjh4T1B6VnNLcnVYWkpPSENJc1hjWld6cVZrNVBsQzN0dUZOS0M4aTNlMjQzOVgvbWpBZjJKMk5WamY3bG4yRkF2SjJOTGx0ZXBTcmpIc044Sm05K0FVd28wY2NBNWpLdmFPNWFSa0FEcnZlZkhJM014WmVRSTRhaTZqeUFPUlhwK1hYQ2d3TFhEcUhQaDRIYitSeGFwU2xnODk0TlpLUXNjVHU2TXBBeHNTMTgrMVE9PSIsInZlcnNpb24iOjEsImlhdCI6MTc2NzA5NTM3NywiaXNzIjoiZXBpY3MuZ2cifQ.Gh4s-0BFu9A-rcfjksptw9eKsgdKxeky1fQnT0FnOHuboMnx-HZWQjSEEh8YVmU8",
+    "userNick": "al3x95md",
+    "dayStart": "6:14",
+    "dayEnd": "22:40",
     "baseInterval": "30",
     "randomScale1": "3",
-    "randomScale2": "12"
+    "randomScale2": "20"
   }
 ]

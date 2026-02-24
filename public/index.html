@@ -76,6 +76,7 @@
     .btn.success { background: var(--good); border-color: var(--good); color: white; }
     .btn.warning { background: var(--warn); border-color: var(--warn); color: white; }
     .btn.danger { background: var(--bad); border-color: var(--bad); color: white; }
+    .btn.info { background: #6b7280; border-color: #6b7280; color: white; }
     .user-card {
       background: #f9fafb; 
       border: 1px solid var(--border); 
@@ -207,7 +208,8 @@
     .badge-claiming { background: #ede9fe; color: #5b21b6; }
     .badge-checking { background: #dbeafe; color: #1e40af; }
     .badge-spinning { background: #cffafe; color: #155e75; }
-    .badge-completed { background: #d1fae5; color: #065f46; }
+    .badge-ready { background: #d1fae5; color: #065f46; }
+    .badge-completed { background: #9ca3af; color: #1f2937; }
     .badge-error { background: #fee2e2; color: #991b1b; }
     .funds-diff {
       font-size: 11px;
@@ -222,6 +224,7 @@
     <h1>Spin Bot <span class="accent">Dashboard</span></h1>
     <div class="row">
       <button class="btn" id="refreshAll">🔄 Refresh</button>
+      <button class="btn info" id="checkAllFunds">💰 Check All Funds</button>
     </div>
   </header>
 
@@ -233,12 +236,12 @@
         <div class="stat-label">Total Users</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value" id="activeUsers">0</div>
-        <div class="stat-label">Currently Processing</div>
+        <div class="stat-value" id="activeCount">0</div>
+        <div class="stat-label">Active in Pool</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value" id="completedUsers">0</div>
-        <div class="stat-label">Completed</div>
+        <div class="stat-value" id="queueLength">0</div>
+        <div class="stat-label">In Queue</div>
       </div>
       <div class="stat-card">
         <div class="stat-value" id="totalSpins">0</div>
@@ -273,6 +276,7 @@
         </div>
         <div class="row" style="margin-top: 16px;">
           <span class="status-badge" id="systemStatus">System Ready</span>
+          <span class="muted" id="statusDetail"></span>
         </div>
       </div>
     </div>
@@ -302,11 +306,13 @@
     // State
     let systemState = {
       isPaused: false,
-      maxConcurrent: 5,
-      spinDelay: 7,
-      minFundsThreshold: 10000,
-      activeUsers: 0,
-      completedUsers: 0,
+      settings: {
+        maxConcurrent: 5,
+        spinDelay: 7,
+        minFundsThreshold: 10000
+      },
+      activeCount: 0,
+      queueLength: 0,
       totalUsers: 0
     };
 
@@ -365,7 +371,7 @@
       userIds.forEach((id) => {
         const u = users[id];
         const statusClass = `badge-${u.status || 'idle'}`;
-        const progressPercent = u.maxSpinsThisRound ? (u.spinsCompletedThisRound / u.maxSpinsThisRound * 100) : 0;
+        const progressPercent = u.spinsRemaining ? ((u.spinsDoneInRound || 0) / ((u.spinsDoneInRound || 0) + u.spinsRemaining) * 100) : 0;
         
         // Calculate funds difference
         const fundsDiff = u.currentFunds - u.initialFunds;
@@ -376,13 +382,12 @@
           <div class="user-card">
             <div class="user-head">
               <div style="display:flex; align-items:center; gap:8px;">
-                <h3>${id} - ${u.userNick}</h3>
-              <!--  <span class="user-nick">${u.userNick}</span>-->
-				
+                <h3>${id} <span class="user-nick">${u.nick || ''}</span></h3>
                 <span class="status-badge ${statusClass}">${u.status || 'idle'}</span>
               </div>
               <div class="row">
-                <button class="btn small" data-act="refresh" data-id="${id}">Refresh Token</button>
+                <button class="btn small" data-act="refresh" data-id="${id}">🔄 Refresh Token</button>
+                <button class="btn small" data-act="check-funds" data-id="${id}">💰 Check Funds</button>
               </div>
             </div>
             
@@ -393,9 +398,9 @@
             
             <div class="kv">
               <span class="muted">Status</span>
-              <span>${u.isProcessing ? '🔄 Processing' : (u.isActive ? '✅ Active' : '❌ Inactive')}</span>
+              <span>${u.isActive ? '✅ Active' : '❌ Inactive'}</span>
               <span class="muted">Spins (Total/Round)</span>
-              <span>${u.totalSpinsRun || 0} / ${u.spinsCompletedThisRound || 0} of ${u.maxSpinsThisRound || 0}</span>
+              <span>${u.totalSpinsRun || 0} / ${u.spinsDoneInRound || 0} of ${(u.spinsDoneInRound || 0) + (u.spinsRemaining || 0)}</span>
               
               <span class="muted">Initial Funds</span>
               <span>${(u.initialFunds || 0).toLocaleString()}</span>
@@ -414,7 +419,7 @@
               <span class="${u.lastError ? 'bad' : 'muted'}">${u.lastError || 'None'}</span>
             </div>
             
-            ${u.maxSpinsThisRound ? `
+            ${(u.spinsRemaining || 0) > 0 ? `
             <div class="progress-bar">
               <div class="progress-fill" style="width: ${progressPercent}%"></div>
             </div>
@@ -433,12 +438,23 @@
       panel.innerHTML = parts.join('\n');
       
       // Add event listeners
-      panel.querySelectorAll('button[data-act]').forEach(btn => {
+      panel.querySelectorAll('button[data-act="refresh"]').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           const id = e.currentTarget.getAttribute('data-id');
-          
           try {
             await sendCommand(`/api/user/${id}/refresh`);
+            await loadAll();
+          } catch (err) {
+            alert(err.message);
+          }
+        });
+      });
+      
+      panel.querySelectorAll('button[data-act="check-funds"]').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const id = e.currentTarget.getAttribute('data-id');
+          try {
+            await sendCommand(`/api/user/${id}/check-funds`);
             await loadAll();
           } catch (err) {
             alert(err.message);
@@ -459,7 +475,7 @@
       
       const lines = logs.map(entry => {
         const time = entry.timestamp ? new Date(entry.timestamp).toLocaleTimeString() : '';
-        return `[${time}] ${entry.userId}: ${entry.message}`;
+        return `[${time}] [${entry.type || 'INFO'}] ${entry.userId}: ${entry.message}`;
       });
       
       box.textContent = lines.join('\n');
@@ -470,12 +486,15 @@
 
     function updateSystemStats(state) {
       document.getElementById('totalUsers').textContent = state.totalUsers || 0;
-      document.getElementById('activeUsers').textContent = state.activeUsers || 0;
-      document.getElementById('completedUsers').textContent = state.completedUsers || 0;
+      document.getElementById('activeCount').textContent = state.activeCount || 0;
+      document.getElementById('queueLength').textContent = state.queueLength || 0;
       
       const systemStatus = document.getElementById('systemStatus');
-      systemStatus.textContent = state.isPaused ? '⏸️ PAUSED' : (state.activeUsers > 0 ? '▶️ RUNNING' : '⏹️ STOPPED');
-      systemStatus.className = `status-badge ${state.isPaused ? 'badge-warning' : (state.activeUsers > 0 ? 'badge-spinning' : 'badge-idle')}`;
+      systemStatus.textContent = state.isPaused ? '⏸️ PAUSED' : (state.activeCount > 0 ? '▶️ RUNNING' : '⏹️ STOPPED');
+      systemStatus.className = `status-badge ${state.isPaused ? 'badge-warning' : (state.activeCount > 0 ? 'badge-spinning' : 'badge-idle')}`;
+      
+      document.getElementById('statusDetail').textContent = 
+        `Max: ${state.settings.maxConcurrent}, Delay: ${state.settings.spinDelay}s, Min: ${state.settings.minFundsThreshold}`;
     }
 
     // Load Functions
@@ -501,6 +520,11 @@
       autoRefresh = false;
       loadAll();
       setTimeout(() => { autoRefresh = true; }, 1000);
+    });
+    
+    document.getElementById('checkAllFunds').addEventListener('click', async () => {
+      await sendCommand('/api/check-all-funds');
+      await loadAll();
     });
     
     document.getElementById('refreshLogs').addEventListener('click', async () => {

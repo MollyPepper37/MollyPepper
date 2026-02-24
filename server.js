@@ -7,31 +7,28 @@ const PORT = process.env.PORT || 3000;
 
 // Configuration
 const CONFIG = {
-    BASE_URL_REF: process.env.BASE_URL_REF || 'https://api.kolex.gg/api/v1/user/refresh-token',
-    BASE_URL_SPIN: process.env.BASE_URL_SPIN || 'https://api.kolex.gg/api/v1/spinner/spin?categoryId=1',
-    BASE_URL_BUY_SPIN: process.env.BASE_URL_BUY_SPIN || 'https://api.kolex.gg/api/v1/spinner/buy-spin?categoryId=1',
-    BASE_URL_OPENPACK: process.env.BASE_URL_OPENPACK || 'https://api.kolex.gg/api/v1/pack/open',
-    BASE_URL_ACH: process.env.BASE_URL_ACH || 'https://api.kolex.gg/api/v1/achievement',
-    BASE_URL_MONEY: process.env.BASE_URL_MONEY || 'https://api.kolex.gg/api/v1/user/funds',
+    BASE_URL_REF: process.env.BASE_URL_REF,
+    BASE_URL_SPIN: process.env.BASE_URL_SPIN,
+    BASE_URL_BUY_SPIN: process.env.BASE_URL_BUY_SPIN,
+    BASE_URL_OPENPACK: process.env.BASE_URL_OPENPACK,
+    BASE_URL_ACH: process.env.BASE_URL_ACH,
+    BASE_URL_MONEY: process.env.BASE_URL_MONEY,
     USERS_FILE: 'users.json',
 };
 
 // Prize mapping for console logs only
 const PRIZE_MAP = {
-    11755: '5,000 Spraycoins',
-    11750: 'Standard Box 2025',
-    11914: 'Krakow Box 2026',
-    11782: 'New Standard Box 2025',
-    11749: '500 Spraycoins',
-    11754: '1,000,000 Spraycoins',
-    11753: '100,000 Spraycoins',
-    11752: '2,500 Spraycoins',
-    11751: '1,000 Spraycoins',
-    11848: 'Mystery Box'
+    11948: '5,000 Spraycoins',
+    11953: 'Standard Box 2026',
+    11947: '500 Spraycoins',
+    11949: '1,000,000 Spraycoins',
+    11950: '100,000 Spraycoins',
+    11951: '2,500 Spraycoins',
+    11952: '1,000 Spraycoins'
 };
 
 // Pack IDs that need opening
-const PACK_IDS = [11782, 11750, 11914, 11848];
+const PACK_IDS = [11953];
 
 // Global state
 let userData = {};
@@ -39,7 +36,6 @@ let userQueue = [];
 let activeUserIds = [];
 let processingTimeout = null;
 let isPaused = false;
-let isProcessing = false;
 
 // Settings (will be set via dashboard)
 let settings = {
@@ -99,7 +95,7 @@ async function loadUserConfig() {
         for (const user of users) {
             userData[user.userId] = {
                 userId: user.userId,
-                nick: user.nick || user.name || user.userId,
+                nick: user.userNick || user.nick || user.name || user.userId,
                 refreshToken: user.refreshToken,
                 jwtToken: null,
                 isActive: false,
@@ -109,8 +105,8 @@ async function loadUserConfig() {
                 totalSpinsRun: 0,
                 totalPacksOpened: 0,
                 achievementsClaimed: 0,
-                spinsRemaining: 0,      // How many spins left in current round
-                spinsDoneInRound: 0,     // Spins done in current round
+                spinsRemaining: 0,
+                spinsDoneInRound: 0,
                 lastError: null,
                 startTime: null,
                 endTime: null
@@ -152,8 +148,8 @@ async function refreshToken(userId) {
     }
 }
 
-// Check user funds
-async function checkFunds(userId) {
+// Check user funds (updates currentFunds)
+async function checkFunds(userId, isInitial = false) {
     const user = userData[userId];
     if (!user || !user.jwtToken) return null;
 
@@ -169,16 +165,19 @@ async function checkFunds(userId) {
         const silvercoins = result.data.data.silvercoins || 0;
         user.currentFunds = silvercoins;
         
-        if (user.initialFunds === 0) {
+        // Only set initial funds if this is the first check
+        if (isInitial && user.initialFunds === 0) {
             user.initialFunds = silvercoins;
             log(userId, `Initial funds: ${silvercoins.toLocaleString()}`, 'FUNDS');
+        } else if (!isInitial) {
+            console.log(`[${new Date().toISOString()}] [FUNDS] ${userId}: Current funds: ${silvercoins.toLocaleString()}`);
         }
         
         return silvercoins;
     } else {
         if (result.status === 401) {
             const refreshSuccess = await refreshToken(userId);
-            if (refreshSuccess) return await checkFunds(userId);
+            if (refreshSuccess) return await checkFunds(userId, isInitial);
         }
         return null;
     }
@@ -268,7 +267,8 @@ async function buyAndSpin(userId) {
         CONFIG.BASE_URL_SPIN,
         'POST',
         { 'x-user-jwt': user.jwtToken },
-        { spinnerId: 6799 },
+        //{ spinnerId: 6799 },
+        { spinnerId: 6832 },
         userId
     );
 
@@ -316,13 +316,13 @@ async function buyAndSpin(userId) {
     return true;
 }
 
-// Initialize a user for a new round
+// Initialize a user for a new round (checks current funds)
 async function initializeUserRound(userId) {
     const user = userData[userId];
     if (!user || !user.isActive) return false;
 
-    // Check current funds
-    const funds = await checkFunds(userId);
+    // Check current funds (this updates currentFunds)
+    const funds = await checkFunds(userId, false);
     if (!funds) return false;
 
     // If funds below threshold, user is done
@@ -376,15 +376,15 @@ async function processNextUser() {
             log(userId, 'Round complete, claiming achievements...', 'ROUND');
             await claimAchievements(userId);
             
-            // Check funds for next round
-            const funds = await checkFunds(userId);
+            // Check funds for next round (this updates currentFunds)
+            const funds = await checkFunds(userId, false);
             if (funds && funds >= settings.minFundsThreshold) {
                 // Start new round
                 const newSpins = Math.floor(funds / 1000);
                 user.spinsRemaining = newSpins;
                 user.spinsDoneInRound = 0;
                 user.status = 'ready';
-                log(userId, `New round started: ${newSpins} spins`, 'ROUND');
+                log(userId, `New round started: ${newSpins} spins (funds: ${funds.toLocaleString()})`, 'ROUND');
             } else {
                 // User is done
                 user.status = 'completed';
@@ -402,7 +402,7 @@ async function processNextUser() {
             user.status = 'ready';
         }
     } else {
-        // Spin failed, mark as error but keep in pool?
+        // Spin failed, mark as error but keep in pool
         user.status = 'error';
         user.lastError = 'Spin failed';
         log(userId, 'Spin failed, marking as error', 'ERROR');
@@ -425,7 +425,7 @@ async function addUsersToActivePool() {
         
         if (!user || !user.isActive) continue;
 
-        // Initialize user for first round
+        // Initialize user for first round (this checks current funds)
         const initialized = await initializeUserRound(nextUserId);
         if (initialized) {
             activeUserIds.push(nextUserId);
@@ -452,7 +452,7 @@ async function initializeAllUsers() {
     const userIds = Object.keys(userData);
     for (const userId of userIds) {
         await refreshToken(userId);
-        await checkFunds(userId);
+        await checkFunds(userId, true); // true = this is initial check
         // Small delay between users to avoid rate limiting
         await new Promise(resolve => setTimeout(resolve, 1000));
     }
@@ -525,7 +525,7 @@ function resetSystem() {
         processingTimeout = null;
     }
     
-    // Reset all user data
+    // Reset all user data (keep tokens)
     Object.values(userData).forEach(user => {
         user.totalSpinsRun = 0;
         user.totalPacksOpened = 0;
@@ -611,11 +611,27 @@ app.post('/api/reset', (req, res) => {
     res.json({ success: true });
 });
 
+app.post('/api/check-all-funds', async (req, res) => {
+    log('system', 'Manual check funds for all users', 'FUNDS');
+    const userIds = Object.keys(userData);
+    for (const userId of userIds) {
+        await checkFunds(userId, false);
+        await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    res.json({ success: true });
+});
+
 app.post('/api/user/:userId/refresh', async (req, res) => {
     const userId = req.params.userId;
     const success = await refreshToken(userId);
-    await checkFunds(userId);
+    await checkFunds(userId, false);
     res.json({ success });
+});
+
+app.post('/api/user/:userId/check-funds', async (req, res) => {
+    const userId = req.params.userId;
+    const funds = await checkFunds(userId, false);
+    res.json({ success: funds !== null, funds });
 });
 
 // Start server

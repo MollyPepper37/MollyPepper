@@ -101,16 +101,6 @@ async function makeAPIRequest(url, method = 'GET', headers = {}, data = null, us
             };
         }
         
-        if (status === 403) {
-            return {
-                success: false,
-                error: 'forbidden',
-                status: 403,
-                retryable: true,
-                banned: false
-            };
-        }
-        
         if (status === 429) {
             return {
                 success: false,
@@ -121,8 +111,8 @@ async function makeAPIRequest(url, method = 'GET', headers = {}, data = null, us
             };
         }
         
-        // Network errors, timeouts, 5xx errors are retryable
-        const isRetryable = !status || status >= 500 || status === 408 || error.code === 'ECONNABORTED';
+        // All other errors (including 403) are retryable if they're server errors or network issues
+        const isRetryable = !status || status >= 400 || status === 408 || error.code === 'ECONNABORTED';
         
         return {
             success: false,
@@ -172,12 +162,8 @@ async function retryAtomicOperation(operation, userId, context = 'operation', re
                 return retryAtomicOperation(operation, userId, context, retryCount + 1);
             }
             
-            // Permanent failure or max retries exceeded
-            if (result.banned) {
-                log(userId, `Account banned during ${context}`, 'BANNED');
-            } else {
-                log(userId, `${context} failed permanently after ${retryCount} retries`, 'ERROR');
-            }
+            // Max retries exceeded
+            log(userId, `${context} failed permanently after ${retryCount} retries`, 'ERROR');
             return result;
         }
         
@@ -218,7 +204,6 @@ async function loadUserConfig() {
                 lastError: null,
                 startTime: null,
                 endTime: null,
-                banned: false,
                 retryCount: 0
             };
         }
@@ -250,16 +235,10 @@ async function refreshToken(userId) {
         log(userId, 'Token refreshed', 'TOKEN');
         return true;
     } else {
-        if (result.banned) {
-            user.banned = true;
-            user.status = 'banned';
-            log(userId, 'Account banned', 'BANNED');
-        } else {
-            user.isActive = false;
-            user.status = 'error';
-            user.lastError = 'Token refresh failed';
-            log(userId, 'Token refresh failed', 'ERROR');
-        }
+        user.isActive = false;
+        user.status = 'error';
+        user.lastError = 'Token refresh failed';
+        log(userId, 'Token refresh failed', 'ERROR');
         return false;
     }
 }
@@ -267,7 +246,7 @@ async function refreshToken(userId) {
 // Check user funds (updates currentFunds)
 async function checkFunds(userId, isInitial = false) {
     const user = userData[userId];
-    if (!user || !user.jwtToken || user.banned) return null;
+    if (!user || !user.jwtToken) return null;
 
     const result = await retryAtomicOperation(
         async () => await makeAPIRequest(
@@ -294,20 +273,14 @@ async function checkFunds(userId, isInitial = false) {
         }
         
         return silvercoins;
-    } else {
-        if (result.banned) {
-            user.banned = true;
-            user.status = 'banned';
-            log(userId, 'Account banned during funds check', 'BANNED');
-        }
-        return null;
     }
+    return null;
 }
 
 // Claim achievements for a user
 async function claimAchievements(userId) {
     const user = userData[userId];
-    if (!user || !user.jwtToken || user.banned) return 0;
+    if (!user || !user.jwtToken) return 0;
 
     let totalClaimed = 0;
     const userAchievementsUrl = `${CONFIG.BASE_URL_ACH}/${user.userId}/user`;
@@ -320,11 +293,6 @@ async function claimAchievements(userId) {
     );
     
     if (!achievementsResult.success) {
-        if (achievementsResult.banned) {
-            user.banned = true;
-            user.status = 'banned';
-            log(userId, 'Account banned during achievements check', 'BANNED');
-        }
         return 0;
     }
 
@@ -372,7 +340,7 @@ async function claimAchievements(userId) {
 // Buy and execute spin as ONE ATOMIC OPERATION
 async function buyAndSpinAtomic(userId) {
     const user = userData[userId];
-    if (!user?.jwtToken || user.banned) return { success: false, banned: user.banned };
+    if (!user?.jwtToken) return { success: false };
 
     // Buy spin
     const buyResult = await makeAPIRequest(
@@ -384,10 +352,9 @@ async function buyAndSpinAtomic(userId) {
     );
 
     if (!buyResult.success) {
-        // Pass through special error types
+        // Pass through error types
         return {
             success: false,
-            banned: buyResult.banned,
             needsRefresh: buyResult.needsRefresh,
             rateLimit: buyResult.rateLimit,
             retryable: buyResult.retryable,
@@ -406,18 +373,16 @@ async function buyAndSpinAtomic(userId) {
     );
 
     if (!spinResult.success) {
-        // If spin fails but buy succeeded, this is bad - we have an orphaned spin purchase
-        // But we can't revert it, so we'll log it and still need to handle the error
+        // Spin failed but buy succeeded - log it
         log(userId, 'CRITICAL: Spin purchased but execution failed', 'ERROR');
         return {
             success: false,
-            banned: spinResult.banned,
             needsRefresh: spinResult.needsRefresh,
             rateLimit: spinResult.rateLimit,
             retryable: spinResult.retryable,
             error: spinResult.error,
             stage: 'spin',
-            boughtButFailed: true // Special flag indicating we have an orphaned spin
+            boughtButFailed: true
         };
     }
 
@@ -461,7 +426,7 @@ async function buyAndSpinAtomic(userId) {
 // Process a single spin for a user (with full atomic retry)
 async function processUserSpin(userId) {
     const user = userData[userId];
-    if (!user || user.banned) return { success: false, banned: true };
+    if (!user) return { success: false };
 
     // Use the atomic retry wrapper around the entire buy+spin operation
     const result = await retryAtomicOperation(
@@ -486,33 +451,22 @@ async function processUserSpin(userId) {
         return { success: true };
         
     } else {
-        // Handle permanent failures
-        if (result.banned) {
-            user.banned = true;
-            user.status = 'banned';
-            log(userId, 'Account banned during spin', 'BANNED');
-        } else {
-            // Mark as error but keep in pool for possible later retry
-            user.status = 'error';
-            user.lastError = result.error || 'Spin failed';
-            
-            // Special handling for orphaned spin (bought but not executed)
-            if (result.boughtButFailed) {
-                log(userId, 'WARNING: Spin was purchased but execution failed', 'ERROR');
-                // We need to decrement spinsRemaining because the spin was technically used
-                // even though execution failed? Or should we retry execution?
-                // For safety, we'll NOT decrement spinsRemaining and let retry handle it
-            }
+        // Mark as error
+        user.status = 'error';
+        user.lastError = result.error || 'Spin failed';
+        
+        if (result.boughtButFailed) {
+            log(userId, 'WARNING: Spin was purchased but execution failed', 'ERROR');
         }
         
-        return { success: false, banned: result.banned };
+        return { success: false };
     }
 }
 
 // Initialize a user for a new round (checks current funds)
 async function initializeUserRound(userId) {
     const user = userData[userId];
-    if (!user || !user.isActive || user.banned) return false;
+    if (!user || !user.isActive) return false;
 
     // Check current funds (this updates currentFunds)
     const funds = await checkFunds(userId, false);
@@ -540,10 +494,10 @@ async function initializeUserRound(userId) {
 async function processNextUser() {
     if (isPaused || activeUserIds.length === 0) return;
 
-    // Filter out users that are not ready (exclude banned)
+    // Filter out users that are not ready
     const readyUsers = activeUserIds.filter(id => {
         const user = userData[id];
-        return user && user.isActive && !user.banned && user.status === 'ready' && user.spinsRemaining > 0;
+        return user && user.isActive && user.status === 'ready' && user.spinsRemaining > 0;
     });
 
     if (readyUsers.length === 0) {
@@ -569,7 +523,7 @@ async function processNextUser() {
             log(userId, 'Round complete, claiming achievements...', 'ROUND');
             await claimAchievements(userId);
             
-            // Check funds for next round (this updates currentFunds)
+            // Check funds for next round
             const funds = await checkFunds(userId, false);
             if (funds && funds >= settings.minFundsThreshold) {
                 // Start new round
@@ -595,20 +549,12 @@ async function processNextUser() {
             user.status = 'ready';
         }
     } else {
-        // Check if user is banned
-        if (user.banned) {
-            log(userId, 'User banned, removing from active pool', 'BANNED');
-            activeUserIds = activeUserIds.filter(id => id !== userId);
-            await addUsersToActivePool();
-        } else {
-            // Spin failed but not banned, mark as error
-            user.status = 'error';
-            user.lastError = 'Spin failed after retries';
-            log(userId, 'Spin failed permanently, marking as error', 'ERROR');
-            // Remove from active pool so it doesn't block others
-            activeUserIds = activeUserIds.filter(id => id !== userId);
-            await addUsersToActivePool();
-        }
+        // Spin failed, mark as error and remove from active pool
+        user.status = 'error';
+        user.lastError = 'Spin failed after retries';
+        log(userId, 'Spin failed permanently, removing from pool', 'ERROR');
+        activeUserIds = activeUserIds.filter(id => id !== userId);
+        await addUsersToActivePool();
     }
 
     // Schedule next user after delay
@@ -626,23 +572,19 @@ async function addUsersToActivePool() {
         const nextUserId = userQueue.shift();
         const user = userData[nextUserId];
         
-        if (!user || !user.isActive || user.banned) continue;
+        if (!user || !user.isActive) continue;
 
-        // Initialize user for first round (this checks current funds)
+        // Initialize user for first round
         const initialized = await initializeUserRound(nextUserId);
         if (initialized) {
             activeUserIds.push(nextUserId);
             user.startTime = user.startTime || new Date().toISOString();
             log(nextUserId, `Added to active pool`, 'QUEUE');
         } else {
-            // User couldn't be initialized (probably below threshold or banned)
-            if (user.banned) {
-                log(nextUserId, `Skipped - account banned`, 'QUEUE');
-            } else {
-                user.status = 'completed';
-                user.endTime = new Date().toISOString();
-                log(nextUserId, `Skipped - below threshold`, 'QUEUE');
-            }
+            // User couldn't be initialized (probably below threshold)
+            user.status = 'completed';
+            user.endTime = new Date().toISOString();
+            log(nextUserId, `Skipped - below threshold`, 'QUEUE');
         }
     }
 }
@@ -688,7 +630,7 @@ function startProcessing(newSettings) {
     activeUserIds = [];
     
     Object.values(userData).forEach(user => {
-        if (user.status !== 'completed' && user.status !== 'banned') {
+        if (user.status !== 'completed') {
             user.status = 'idle';
             user.spinsRemaining = 0;
             user.spinsDoneInRound = 0;
@@ -738,12 +680,10 @@ function resetSystem() {
         user.retryCount = 0;
     });
     
-    userQueue = Object.keys(userData)
-        .filter(id => !userData[id].banned)
-        .sort(() => Math.random() - 0.5);
+    userQueue = Object.keys(userData).sort(() => Math.random() - 0.5);
     activeUserIds = [];
     
-    log('system', `System reset. ${userQueue.length} users in queue (banned users excluded).`, 'RESET');
+    log('system', `System reset. ${userQueue.length} users in queue.`, 'RESET');
 }
 
 // Safe user data for frontend
@@ -754,8 +694,8 @@ function safeUsersSnapshot() {
             userId: u.userId,
             nick: u.nick,
             jwtToken: u.jwtToken || 'No token',
-            isActive: u.isActive && !u.banned,
-            status: u.banned ? 'banned' : (u.status || 'idle'),
+            isActive: u.isActive,
+            status: u.status || 'idle',
             totalSpinsRun: u.totalSpinsRun || 0,
             totalPacksOpened: u.totalPacksOpened || 0,
             initialFunds: u.initialFunds || 0,
@@ -765,8 +705,7 @@ function safeUsersSnapshot() {
             achievementsClaimed: u.achievementsClaimed || 0,
             lastError: u.lastError,
             startTime: u.startTime,
-            endTime: u.endTime,
-            banned: u.banned || false
+            endTime: u.endTime
         };
     }
     return out;
@@ -791,8 +730,7 @@ app.get('/api/system-state', (req, res) => {
         isPaused,
         activeCount: activeUserIds.length,
         queueLength: userQueue.length,
-        totalUsers: Object.keys(userData).length,
-        bannedUsers: Object.values(userData).filter(u => u.banned).length
+        totalUsers: Object.keys(userData).length
     });
 });
 
@@ -817,10 +755,8 @@ app.post('/api/check-all-funds', async (req, res) => {
     log('system', 'Manual check funds for all users', 'FUNDS');
     const userIds = Object.keys(userData);
     for (const userId of userIds) {
-        if (!userData[userId].banned) {
-            await checkFunds(userId, false);
-            await new Promise(resolve => setTimeout(resolve, 500));
-        }
+        await checkFunds(userId, false);
+        await new Promise(resolve => setTimeout(resolve, 500));
     }
     res.json({ success: true });
 });

@@ -85,7 +85,7 @@
     }
     .user-head { display: flex; gap: 16px; align-items: center; justify-content: space-between; }
     .user-head h3 { margin: 0; font-size: 16px; font-weight: 600; color: var(--accent); }
-    .user-name {
+    .user-nick {
       font-size: 14px;
       color: var(--muted);
       margin-left: 4px;
@@ -267,7 +267,6 @@
             <label>Min Funds:</label>
             <input type="number" id="minFunds" min="1000" max="1000000" step="1000" value="10000">
           </div>
-          <button class="btn primary" id="applySettings">Apply Settings</button>
           <button class="btn success" id="startButton">▶️ Start</button>
           <button class="btn warning" id="pauseButton">⏸️ Pause</button>
           <button class="btn danger" id="resetButton">🔄 Reset Stats</button>
@@ -292,7 +291,7 @@
       <div class="section">
         <div class="row" style="margin-bottom:16px; justify-content:space-between;">
           <button class="btn small" id="refreshLogs">Refresh Logs</button>
-          <span class="muted">Showing latest events (spins not shown)</span>
+          <span class="muted">Showing latest events</span>
         </div>
         <pre class="logs" id="logsBox">Loading logs...</pre>
       </div>
@@ -378,7 +377,7 @@
             <div class="user-head">
               <div style="display:flex; align-items:center; gap:8px;">
                 <h3>${id}</h3>
-                <span class="user-name">${u.name || id}</span>
+                <span class="user-nick">${u.nick || id}</span>
                 <span class="status-badge ${statusClass}">${u.status || 'idle'}</span>
               </div>
               <div class="row">
@@ -464,7 +463,7 @@
       
       box.textContent = lines.join('\n');
       
-      // Restore scroll position instead of auto-scrolling
+      // Restore scroll position
       box.scrollTop = lastScrollPosition;
     }
 
@@ -474,31 +473,9 @@
       document.getElementById('completedUsers').textContent = state.completedUsers || 0;
       
       const systemStatus = document.getElementById('systemStatus');
-      systemStatus.textContent = state.isPaused ? '⏸️ PAUSED' : '▶️ RUNNING';
-      systemStatus.className = `status-badge ${state.isPaused ? 'badge-warning' : 'badge-spinning'}`;
-      
-      // Update input fields but don't override user changes
-      const maxInput = document.getElementById('maxConcurrent');
-      const delayInput = document.getElementById('spinDelay');
-      const minFundsInput = document.getElementById('minFunds');
-      
-      if (!maxInput.dataset.userChanged) maxInput.value = state.maxConcurrent;
-      if (!delayInput.dataset.userChanged) delayInput.value = state.spinDelay;
-      if (!minFundsInput.dataset.userChanged) minFundsInput.value = state.minFundsThreshold;
+      systemStatus.textContent = state.isPaused ? '⏸️ PAUSED' : (state.activeUsers > 0 ? '▶️ RUNNING' : '⏹️ STOPPED');
+      systemStatus.className = `status-badge ${state.isPaused ? 'badge-warning' : (state.activeUsers > 0 ? 'badge-spinning' : 'badge-idle')}`;
     }
-
-    // Track user changes to input fields
-    document.getElementById('maxConcurrent').addEventListener('input', function() {
-      this.dataset.userChanged = 'true';
-    });
-    
-    document.getElementById('spinDelay').addEventListener('input', function() {
-      this.dataset.userChanged = 'true';
-    });
-    
-    document.getElementById('minFunds').addEventListener('input', function() {
-      this.dataset.userChanged = 'true';
-    });
 
     // Load Functions
     async function loadAll() {
@@ -530,23 +507,12 @@
       renderLogs(logs);
     });
 
-    document.getElementById('applySettings').addEventListener('click', async () => {
+    document.getElementById('startButton').addEventListener('click', async () => {
       const maxConcurrent = document.getElementById('maxConcurrent').value;
       const spinDelay = document.getElementById('spinDelay').value;
       const minFundsThreshold = document.getElementById('minFunds').value;
       
-      await sendCommand('/api/settings', { maxConcurrent, spinDelay, minFundsThreshold });
-      
-      // Reset user changed flags
-      document.getElementById('maxConcurrent').dataset.userChanged = '';
-      document.getElementById('spinDelay').dataset.userChanged = '';
-      document.getElementById('minFunds').dataset.userChanged = '';
-      
-      await loadAll();
-    });
-
-    document.getElementById('startButton').addEventListener('click', async () => {
-      await sendCommand('/api/start');
+      await sendCommand('/api/start', { maxConcurrent, spinDelay, minFundsThreshold });
       await loadAll();
     });
 
@@ -562,7 +528,7 @@
       }
     });
 
-    // Auto-refresh every 3 seconds but preserve scroll position
+    // Auto-refresh every 3 seconds
     setInterval(() => {
       if (autoRefresh) {
         loadAll();

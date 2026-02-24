@@ -18,31 +18,18 @@ let systemState = {
     queuePosition: 0
 };
 
-function debugLog(userId, action, url, method, data = null, response = null, error = null) {
-    // Only log important events, not every spin
-    const importantActions = ['REFRESH', 'CLAIM', 'FUNDS', 'PACK', 'ERROR', 'START', 'PAUSE', 'COMPLETE'];
-    if (!importantActions.includes(action) && action !== 'REQUEST' && action !== 'SUCCESS') {
-        return; // Skip logging for regular spin requests/results
-    }
-    
+let processingLoopActive = false;
+
+function debugLog(userId, action, message) {
     const debugEntry = {
         timestamp: new Date().toISOString(),
         userId,
-        message: action === 'ERROR' ? `❌ ${error?.message || 'Error'}` :
-                 action === 'REFRESH' ? '🔄 Token refresh' :
-                 action === 'CLAIM' ? `🎯 Claimed achievements` :
-                 action === 'FUNDS' ? `💰 Funds check` :
-                 action === 'PACK' ? `📦 Pack opened` :
-                 action === 'START' ? '▶️ Started' :
-                 action === 'PAUSE' ? '⏸️ Paused' :
-                 action === 'COMPLETE' ? '✅ Completed' : ''
+        message: message
     };
 
-    if (debugEntry.message) {
-        debugLogs.unshift(debugEntry);
-        if (debugLogs.length > 200) debugLogs.pop();
-        console.log(`[${debugEntry.timestamp}] ${userId}: ${debugEntry.message}`);
-    }
+    debugLogs.unshift(debugEntry);
+    if (debugLogs.length > 200) debugLogs.pop();
+    console.log(`[${debugEntry.timestamp}] ${userId}: ${message}`);
 }
 
 // Configuration
@@ -58,8 +45,6 @@ const CONFIG = {
 
 // Global storage
 let userData = {};
-let activeUsers = []; // Array of users currently being processed
-let pendingQueue = [];
 
 // Load user configuration
 async function loadUserConfig() {
@@ -77,7 +62,7 @@ async function loadUserConfig() {
                 packsOpened: 0,
                 totalSpinsRun: 0,
                 totalPacksOpened: 0,
-                initialFunds: 0, // Store initial funds
+                initialFunds: 0,
                 currentFunds: 0,
                 lastFunds: 0,
                 maxSpinsThisRound: 0,
@@ -126,7 +111,6 @@ async function refreshToken(userId) {
     if (!user) return false;
     
     user.status = 'refreshing';
-    console.log(`[${userId}] 🔄 Refreshing token...`);
 
     const result = await makeAPIRequest(
         CONFIG.BASE_URL_REF, 
@@ -139,13 +123,13 @@ async function refreshToken(userId) {
     if (result.success && result.data.data?.jwt) {
         user.jwtToken = result.data.data.jwt;
         user.isActive = true;
-        debugLog(userId, 'REFRESH');
+        debugLog(userId, 'REFRESH', '🔄 Token refreshed');
         return true;
     } else {
         user.isActive = false;
         user.status = 'error';
         user.lastError = `Token refresh failed`;
-        debugLog(userId, 'ERROR', null, null, null, null, { message: 'Token refresh failed' });
+        debugLog(userId, 'ERROR', '❌ Token refresh failed');
         return false;
     }
 }
@@ -199,7 +183,7 @@ async function claimAchievements(userId) {
 
         if (totalClaimed > 0) {
             user.achievementsClaimed += totalClaimed;
-            debugLog(userId, 'CLAIM');
+            debugLog(userId, 'CLAIM', `🎯 Claimed ${totalClaimed} achievements`);
         }
         
         return totalClaimed;
@@ -227,9 +211,9 @@ async function checkFunds(userId) {
         // Store initial funds if not set
         if (user.initialFunds === 0) {
             user.initialFunds = silvercoins;
+            debugLog(userId, 'FUNDS', `💰 Initial funds: ${silvercoins.toLocaleString()}`);
         }
         
-        debugLog(userId, 'FUNDS');
         return silvercoins;
     } else {
         if (result.status === 401) {
@@ -278,8 +262,8 @@ async function openPack(userId, packId) {
     if (result.success) {
         user.packsOpened++;
         user.totalPacksOpened++;
-        debugLog(userId, 'PACK');
-        await new Promise(resolve => setTimeout(resolve, 3000)); // Extra delay for packs
+        debugLog(userId, 'PACK', `📦 Pack opened: ${packId}`);
+        await new Promise(resolve => setTimeout(resolve, 3000));
         return true;
     } else if (result.status === 401) {
         const refreshSuccess = await refreshToken(userId);
@@ -339,9 +323,6 @@ async function processSingleSpin(userId) {
             return false;
         }
         
-        // Delay between buy and execute
-        await new Promise(resolve => setTimeout(resolve, systemState.spinDelay * 1000));
-        
         // Execute spin
         const spinResult = await executeSpin(userId);
         if (spinResult === null) {
@@ -364,27 +345,16 @@ async function shouldUserContinue(userId) {
     const funds = await checkFunds(userId);
     if (funds === null) return false;
     
-    return funds >= systemState.minFundsThreshold;
-}
-
-// Process a single user's turn
-async function processUserTurn(userId) {
-    const user = userData[userId];
-    if (!user || !user.isActive || systemState.isPaused) return;
-
-    try {
-        // Do one spin
-        const spinSuccess = await processSingleSpin(userId);
-        
-        if (!spinSuccess) {
-            // If spin failed, mark as error
-            user.status = 'error';
-            debugLog(userId, 'ERROR', null, null, null, null, { message: 'Spin failed' });
-        }
-        
-    } catch (error) {
-        console.error(`Error processing user ${userId}:`, error);
+    const shouldContinue = funds >= systemState.minFundsThreshold;
+    
+    if (!shouldContinue && user.status !== 'completed') {
+        user.status = 'completed';
+        user.endTime = new Date().toISOString();
+        systemState.completedUsers++;
+        debugLog(userId, 'COMPLETE', `✅ User completed (funds: ${funds.toLocaleString()})`);
     }
+    
+    return shouldContinue;
 }
 
 // Select next random user from active pool
@@ -393,8 +363,7 @@ function selectNextRandomUser() {
         const user = userData[id];
         return user.isActive && 
                user.status !== 'completed' && 
-               user.status !== 'error' &&
-               !systemState.isPaused;
+               user.status !== 'error';
     });
     
     if (availableUsers.length === 0) return null;
@@ -405,38 +374,37 @@ function selectNextRandomUser() {
 
 // Main processing loop
 async function processingLoop() {
-    if (systemState.isPaused) {
-        setTimeout(processingLoop, 1000);
-        return;
-    }
+    if (!processingLoopActive) return;
     
-    // Check if we have active users
-    const activeCount = Object.values(userData).filter(u => u.status === 'spinning' || u.status === 'checking').length;
-    
-    if (activeCount < systemState.maxConcurrent) {
-        const nextUser = selectNextRandomUser();
+    if (!systemState.isPaused) {
+        // Get current active processing count
+        const currentlyProcessing = Object.values(userData).filter(u => u.status === 'spinning').length;
         
-        if (nextUser) {
-            // Check if this user should continue
-            const shouldContinue = await shouldUserContinue(nextUser);
+        if (currentlyProcessing < systemState.maxConcurrent) {
+            const nextUser = selectNextRandomUser();
             
-            if (!shouldContinue) {
-                userData[nextUser].status = 'completed';
-                userData[nextUser].endTime = new Date().toISOString();
-                systemState.completedUsers++;
-                debugLog(nextUser, 'COMPLETE');
+            if (nextUser) {
+                // Check if this user should continue
+                const shouldContinue = await shouldUserContinue(nextUser);
                 
-                // Check funds one last time for display
-                await checkFunds(nextUser);
-            } else {
-                // Process this user's turn
-                await processUserTurn(nextUser);
+                if (shouldContinue) {
+                    // Process this user's turn
+                    userData[nextUser].status = 'spinning';
+                    processSingleSpin(nextUser).then(() => {
+                        // After spin completes, add delay
+                        setTimeout(() => {
+                            if (processingLoopActive) processingLoop();
+                        }, 100);
+                    });
+                }
             }
         }
     }
     
-    // Schedule next iteration with delay
-    setTimeout(processingLoop, systemState.spinDelay * 1000);
+    // Schedule next iteration
+    setTimeout(() => {
+        if (processingLoopActive) processingLoop();
+    }, systemState.spinDelay * 1000);
 }
 
 // Initialize all users
@@ -455,7 +423,7 @@ async function initializeApp() {
         }
         
         console.log('✅ All users initialized. Waiting for start command...');
-        debugLog('system', 'START', null, null, null, null, null, 'System ready. Click Start to begin processing.');
+        debugLog('system', 'READY', 'System ready. Click Start to begin processing.');
         
     } catch (error) {
         console.error('❌ Initialization failed:', error);
@@ -464,30 +432,41 @@ async function initializeApp() {
 
 // Start processing
 function startProcessing() {
+    // Update settings from current input values
+    const maxConcurrent = global.pendingMaxConcurrent || systemState.maxConcurrent;
+    const spinDelay = global.pendingSpinDelay || systemState.spinDelay;
+    const minFundsThreshold = global.pendingMinFunds || systemState.minFundsThreshold;
+    
+    systemState.maxConcurrent = parseInt(maxConcurrent) || 5;
+    systemState.spinDelay = parseFloat(spinDelay) || 7;
+    systemState.minFundsThreshold = parseInt(minFundsThreshold) || 10000;
+    
     if (systemState.isPaused) {
         systemState.isPaused = false;
-        debugLog('system', 'START', null, null, null, null, null, '▶️ Resuming processing');
+        debugLog('system', 'START', '▶️ Resuming processing');
     } else {
-        debugLog('system', 'START', null, null, null, null, null, '▶️ Starting processing');
+        debugLog('system', 'START', '▶️ Starting processing');
     }
     
-    // Start the processing loop if not already running
-    processingLoop();
+    // Start the processing loop
+    if (!processingLoopActive) {
+        processingLoopActive = true;
+        processingLoop();
+    }
 }
 
 // Pause processing
 function pauseProcessing() {
     systemState.isPaused = true;
-    debugLog('system', 'PAUSE', null, null, null, null, null, '⏸️ Processing paused');
+    debugLog('system', 'PAUSE', '⏸️ Processing paused');
 }
 
-// Update settings
+// Update settings (store as pending)
 function updateSettings(maxConcurrent, spinDelay, minFundsThreshold) {
-    systemState.maxConcurrent = parseInt(maxConcurrent) || 5;
-    systemState.spinDelay = parseFloat(spinDelay) || 7;
-    systemState.minFundsThreshold = parseInt(minFundsThreshold) || 10000;
-    debugLog('system', 'SETTINGS', null, null, null, null, null, 
-        `⚙️ Settings: Max=${systemState.maxConcurrent}, Delay=${systemState.spinDelay}s, Min Funds=${systemState.minFundsThreshold}`);
+    global.pendingMaxConcurrent = maxConcurrent;
+    global.pendingSpinDelay = spinDelay;
+    global.pendingMinFunds = minFundsThreshold;
+    debugLog('system', 'SETTINGS', `⚙️ Settings updated (pending): Max=${maxConcurrent}, Delay=${spinDelay}s, Min Funds=${minFundsThreshold}`);
 }
 
 // Safe user data for frontend
@@ -496,10 +475,10 @@ function safeUsersSnapshot() {
     for (const [id, u] of Object.entries(userData)) {
         out[id] = {
             userId: u.userId,
-            name: u.name || id, // Keep name field
-            jwtToken: u.jwtToken || 'No token', // Full JWT for copying
+            nick: u.nick || u.name || id,
+            jwtToken: u.jwtToken || 'No token',
             isActive: u.isActive,
-            isProcessing: u.isProcessing,
+            isProcessing: u.status === 'spinning',
             spinCount: u.spinCount,
             packsOpened: u.packsOpened,
             totalSpinsRun: u.totalSpinsRun || 0,
@@ -538,6 +517,8 @@ app.get('/api/system-state', (req, res) => {
 
 // Control endpoints
 app.post('/api/start', (req, res) => {
+    const { maxConcurrent, spinDelay, minFundsThreshold } = req.body;
+    if (maxConcurrent) updateSettings(maxConcurrent, spinDelay, minFundsThreshold);
     startProcessing();
     res.json({ success: true, message: 'Processing started' });
 });
@@ -568,18 +549,20 @@ app.post('/api/reset', (req, res) => {
         user.packsOpened = 0;
         user.totalSpinsRun = 0;
         user.totalPacksOpened = 0;
-        user.initialFunds = user.currentFunds; // Set initial to current
+        user.initialFunds = user.currentFunds;
         user.achievementsClaimed = 0;
         user.lastError = null;
         user.status = 'idle';
         user.startTime = null;
         user.endTime = null;
+        user.maxSpinsThisRound = 0;
+        user.spinsCompletedThisRound = 0;
     }
     
     systemState.completedUsers = 0;
     systemState.isPaused = false;
     
-    debugLog('system', 'RESET', null, null, null, null, null, '🔄 System reset');
+    debugLog('system', 'RESET', '🔄 System reset');
     res.json({ success: true, message: 'System reset' });
 });
 

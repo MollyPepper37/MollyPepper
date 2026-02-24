@@ -106,8 +106,8 @@ async function makeAPIRequest(url, method = 'GET', headers = {}, data = null, us
                 success: false,
                 error: 'forbidden',
                 status: 403,
-                retryable: false,
-                banned: true
+                retryable: true,
+                banned: false
             };
         }
         

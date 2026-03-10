@@ -20,7 +20,7 @@ const CONFIG = {
 const PRIZE_MAP = {
     11986: '5,000 Spraycoins',
     11981: 'Standard Box 2026',
-    12013: 'EPL 23 Box 2026',
+    12079: 'EPL 23 Box 2026',
     11980: '500 Spraycoins',
     11985: '1,000,000 Spraycoins',
     11984: '100,000 Spraycoins',
@@ -29,7 +29,7 @@ const PRIZE_MAP = {
 };
 
 // Pack IDs that need opening
-const PACK_IDS = [11981, 12013];
+const PACK_IDS = [11981, 12013, 12079];
 
 // Retry configuration
 const RETRY_CONFIG = {

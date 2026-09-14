@@ -78,6 +78,7 @@ function showFallbackNavigation() {
                 <a href="/pack-solo-scan-open.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Pack Solo Scan/Open</a>
                 <a href="/scanner.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Collection Scanner</a>
                 <a href="/scanner-old.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Collection Scanner (Old)</a>
+                <a href="/spinner.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Spinner Pro</a>
             </div>
             <div class="server-info" style="color: #666; font-size: 12px;">Server: Unknown</div>
         </div>

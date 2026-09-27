@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWT Refresh + Funds Tool</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f4f6fa;
+            color: #1e293b;
+        }
+        h1 { font-weight: 600; font-size: 1.8rem; letter-spacing: -0.02em; margin: 0 0 8px 0; display: flex; align-items: center; gap: 10px; }
+        .sub { font-weight: 400; color: #475569; font-size: 1rem; }
+
+        .config-section {
+            background: white;
+            padding: 20px 24px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            border: 1px solid #eef2f6;
+        }
+        .input-group { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 12px 0; }
+        label { font-weight: 500; font-size: 0.9rem; min-width: 130px; color: #1e293b; }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px 14px;
+            border: 1px solid #d1d9e6;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
+            background: white;
+            transition: 0.2s;
+            resize: vertical;
+        }
+        textarea:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+        input[type="number"] {
+            padding: 8px 14px;
+            border: 1px solid #d1d9e6;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            width: 110px;
+        }
+
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+            gap: 16px;
+            background: white;
+            padding: 20px 24px;
+            border-radius: 20px;
+            margin: 20px 0;
+            border: 1px solid #eef2f6;
+        }
+        .stat-box { background: #f8fafc; padding: 12px 8px; border-radius: 14px; text-align: center; border-left: 4px solid #2563eb; }
+        .stat-value { font-size: 26px; font-weight: 700; color: #0f172a; }
+        .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; color: #64748b; }
+
+        .button-group { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0 12px; }
+        button {
+            padding: 10px 28px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            background: #e2e8f0;
+            color: #1e293b;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        #startButton { background: #2563eb; color: white; }
+        #startButton:hover:not(:disabled) { background: #1d4ed8; }
+        #stopButton { background: #ef4444; color: white; }
+        #stopButton:hover:not(:disabled) { background: #dc2626; }
+        #downloadButton { background: #10b981; color: white; }
+        #downloadButton:hover:not(:disabled) { background: #059669; }
+        #copyJwtButton { background: #8b5cf6; color: white; }
+        #copyJwtButton:hover:not(:disabled) { background: #7c3aed; }
+
+        .progress-container { margin: 16px 0; width: 100%; background: #e2e8f0; border-radius: 40px; overflow: hidden; height: 10px; }
+        .progress-bar { height: 100%; background: #2563eb; width: 0%; transition: width 0.25s ease; }
+
+        #statusMessage { margin: 12px 0; font-weight: 500; padding: 8px 16px; background: white; border-radius: 40px; display: inline-block; }
+
+        .table-container {
+            background: white;
+            border-radius: 20px;
+            padding: 8px 0 0 0;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.02);
+            border: 1px solid #eef2f6;
+            overflow-x: auto;
+            margin-top: 24px;
+        }
+        #resultTable { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        #resultTable th {
+            background: #f8fafc;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            padding: 12px 8px;
+            font-weight: 600;
+            color: #1e293b;
+            border-bottom: 2px solid #e2e8f0;
+            white-space: nowrap;
+            text-align: left;
+        }
+        #resultTable td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+        #resultTable tr:hover td { background: #fafcff; }
+        .jwt-cell {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            cursor: pointer;
+            color: #2563eb;
+        }
+        .jwt-cell:hover { text-decoration: underline; }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-error { background: #fee2e2; color: #991b1b; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+
+        .log-container {
+            background: white;
+            padding: 15px;
+            border-radius: 20px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            border: 1px solid #eef2f6;
+        }
+        .log-entry {
+            padding: 6px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+        }
+        .log-success { color: #059669; }
+        .log-error { color: #dc2626; }
+        .log-info { color: #2563eb; }
+        .log-warning { color: #d97706; }
+
+        .notification {
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin: 10px 0;
+            display: none;
+            font-weight: 500;
+        }
+        .notification-success { background: #d5f4e6; color: #27ae60; border: 1px solid #a3e4c3; }
+        .notification-error { background: #fadbd8; color: #e74c3c; border: 1px solid #f5b7b1; }
+
+        @media (max-width: 700px) {
+            .input-group label { min-width: 100px; }
+            textarea { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <h1>🔑 JWT Refresh + Funds <span class="sub">· Kolex</span></h1>
+
+    <div class="config-section">
+        <div class="input-group">
+            <label for="refreshTokens">Refresh Tokens (one per line):</label>
+            <textarea id="refreshTokens" placeholder="Paste refresh tokens here, one per line&#10;token1&#10;token2&#10;..."></textarea>
+        </div>
+        <div class="input-group">
+            <label for="delayInput">Delay (ms):</label>
+            <input type="number" id="delayInput" value="1500" min="0">
+        </div>
+    </div>
+
+    <div class="stats-panel">
+        <div class="stat-box"><div class="stat-value" id="totalTokens">0</div><div class="stat-label">Total Tokens</div></div>
+        <div class="stat-box"><div class="stat-value" id="processedTokens">0</div><div class="stat-label">Processed</div></div>
+        <div class="stat-box"><div class="stat-value" id="successCount">0</div><div class="stat-label">Successful</div></div>
+        <div class="stat-box"><div class="stat-value" id="failCount">0</div><div class="stat-label">Failed</div></div>
+    </div>
+
+    <div class="button-group">
+        <button id="startButton">▶ Start Refresh</button>
+        <button id="stopButton" disabled>⏹ Stop</button>
+        <button id="downloadButton" disabled>⬇ Download CSV</button>
+        <button id="copyJwtButton" disabled>📋 Copy JWTs</button>
+    </div>
+
+    <div id="statusMessage">Ready</div>
+    <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+
+    <div class="notification" id="notification"></div>
+
+    <div class="table-container">
+        <table id="resultTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>JWT</th>
+                    <th>User ID</th>
+                    <th>Username</th>
+                    <th>KYC</th>
+                    <th>Coronas</th>
+                    <th>USD</th>
+                    <th>Silvercoins</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <div class="log-container" id="logContainer">
+        <div class="log-entry log-info">Ready. Paste refresh tokens and click Start.</div>
+    </div>
+<script src="/nav-loader.js"></script>
+
+<script>
+    // ================= CONFIG =================
+    const PROXY_URL        = '/proxy';
+    const REFRESH_ENDPOINT = '/auth/refresh-jwt';
+    const INFO_ENDPOINT    = '/user/info';
+    const FUNDS_ENDPOINT   = '/user/funds';
+
+    // ================= STATE =================
+    let isProcessing = false;
+    let stopFlag = false;
+    let totalTokens = 0;
+    let processedTokens = 0;
+    let successCount = 0;
+    let failCount = 0;
+    let results = [];
+
+    // ================= DOM =================
+    const $ = id => document.getElementById(id);
+    const startButton = $('startButton');
+    const stopButton = $('stopButton');
+    const downloadButton = $('downloadButton');
+    const copyJwtButton = $('copyJwtButton');
+    const progressBar = $('progressBar');
+    const statusMessage = $('statusMessage');
+    const tableBody = $('tableBody');
+    const logContainer = $('logContainer');
+    const notification = $('notification');
+    const refreshTokensInput = $('refreshTokens');
+    const delayInput = $('delayInput');
+
+    // ================= HELPERS =================
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    function getDelay() {
+        const v = parseInt(delayInput.value, 10);
+        return isNaN(v) || v < 0 ? 1500 : v;
+    }
+
+    function updateStatus(msg, color = '#1e293b') {
+        statusMessage.textContent = msg;
+        statusMessage.style.color = color;
+    }
+
+    function showNotification(msg, type = 'success') {
+        notification.textContent = msg;
+        notification.className = `notification notification-${type}`;
+        notification.style.display = 'block';
+        setTimeout(() => { notification.style.display = 'none'; }, 5000);
+    }
+
+    function addLog(message, type = 'info') {
+        const entry = document.createElement('div');
+        entry.className = `log-entry log-${type}`;
+        entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        logContainer.appendChild(entry);
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    function updateStatsUI() {
+        $('totalTokens').textContent = totalTokens;
+        $('processedTokens').textContent = processedTokens;
+        $('successCount').textContent = successCount;
+        $('failCount').textContent = failCount;
+    }
+
+    // ================= PROXY REQUEST =================
+    async function proxyRequest(endpoint, method = 'GET', headers = {}, data = null) {
+        const res = await fetch(PROXY_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                endpoint: endpoint,
+                method: method,
+                headers: headers,
+                data: data
+            })
+        });
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`HTTP error! status: ${res.status} - ${errorText}`);
+        }
+
+        return await res.json();
+    }
+
+    // ================= REFRESH JWT =================
+    async function refreshJWT(refreshToken) {
+        const headers = {
+            'Content-Type': 'application/json',
+            'x-user-jwt': refreshToken
+        };
+        const payload = { refreshToken: refreshToken };
+        const resp = await proxyRequest(REFRESH_ENDPOINT, 'POST', headers, payload);
+
+        let data = resp;
+        if (data && data.data && data.data.data) data = data.data;
+        const inner = data?.data || data;
+
+        if (!inner || !inner.jwt) {
+            throw new Error('No JWT in refresh response: ' + JSON.stringify(resp).slice(0, 300));
+        }
+
+        return {
+            jwt: inner.jwt,
+            refreshToken: inner.refreshToken || refreshToken,
+            user: inner.user || {}
+        };
+    }
+
+    // ================= FETCH USER INFO =================
+    // GET /user/info with x-user-jwt = new JWT
+    // Returns full user data (id, username, kycCompleted, etc.)
+    async function fetchUserInfo(jwt) {
+        const headers = {
+            'Content-Type': 'application/json',
+            'x-user-jwt': jwt
+        };
+        const resp = await proxyRequest(INFO_ENDPOINT, 'GET', headers, null);
+
+        // Unwrap nested data shapes
+        let data = resp;
+        if (data && data.data && data.data.data) data = data.data;
+        const user = data?.data || data;
+
+        if (!user || typeof user !== 'object') {
+            return {};
+        }
+
+        return user;
+    }
+
+    // ================= FETCH FUNDS =================
+    async function fetchFunds(jwt) {
+        const headers = {
+            'Content-Type': 'application/json',
+            'x-user-jwt': jwt
+        };
+        const resp = await proxyRequest(FUNDS_ENDPOINT, 'GET', headers, null);
+
+        let funds = null;
+        if (resp && resp.data && typeof resp.data === 'object') {
+            funds = resp.data;
+        } else if (resp && typeof resp === 'object') {
+            funds = resp;
+        }
+
+        if (!funds || typeof funds !== 'object') {
+            return { silvercoins: null, coronas: null, usd: null };
+        }
+
+        return {
+            silvercoins: funds.silvercoins ?? null,
+            coronas: funds.coronas ?? null,
+            usd: funds.usd ?? null
+        };
+    }
+
+    // ================= TABLE =================
+    function addRowToTable(r) {
+        const tr = document.createElement('tr');
+
+        const tdIdx = document.createElement('td');
+        tdIdx.textContent = r.index + 1;
+
+        const tdJwt = document.createElement('td');
+        tdJwt.className = 'jwt-cell';
+        tdJwt.textContent = r.jwt || '—';
+        tdJwt.title = r.jwt || '';
+        if (r.jwt) {
+            tdJwt.addEventListener('click', () => {
+                navigator.clipboard.writeText(r.jwt).then(() => {
+                    showNotification('JWT copied to clipboard', 'success');
+                });
+            });
+        }
+
+        const tdUserId = document.createElement('td');
+        tdUserId.textContent = r.userId || '—';
+
+        const tdUsername = document.createElement('td');
+        tdUsername.textContent = r.username || '—';
+
+        const tdKyc = document.createElement('td');
+        tdKyc.textContent = r.kyc === true ? 'Yes' : r.kyc === false ? 'No' : '—';
+
+        const tdCoronas = document.createElement('td');
+        tdCoronas.textContent = r.coronas ?? '—';
+
+        const tdUsd = document.createElement('td');
+        tdUsd.textContent = r.usd ?? '—';
+
+        const tdSilver = document.createElement('td');
+        tdSilver.textContent = r.silvercoins ?? '—';
+
+        const tdStatus = document.createElement('td');
+        if (r.success) {
+            tdStatus.innerHTML = '<span class="badge badge-success">OK</span>';
+        } else {
+            tdStatus.innerHTML = `<span class="badge badge-error" title="${(r.error || '').replace(/"/g,'&quot;')}">FAIL</span>`;
+        }
+
+        tr.appendChild(tdIdx);
+        tr.appendChild(tdJwt);
+        tr.appendChild(tdUserId);
+        tr.appendChild(tdUsername);
+        tr.appendChild(tdKyc);
+        tr.appendChild(tdCoronas);
+        tr.appendChild(tdUsd);
+        tr.appendChild(tdSilver);
+        tr.appendChild(tdStatus);
+
+        tableBody.appendChild(tr);
+    }
+
+    // ================= MAIN =================
+    async function startProcessing() {
+        if (isProcessing) return;
+
+        const raw = refreshTokensInput.value.trim();
+        if (!raw) {
+            showNotification('Please paste at least one refresh token.', 'error');
+            return;
+        }
+        const tokens = raw.split('\n').map(s => s.trim()).filter(Boolean);
+        if (tokens.length === 0) {
+            showNotification('No valid tokens found.', 'error');
+            return;
+        }
+
+        // Reset
+        isProcessing = true;
+        stopFlag = false;
+        totalTokens = tokens.length;
+        processedTokens = 0;
+        successCount = 0;
+        failCount = 0;
+        results = [];
+        tableBody.innerHTML = '';
+        progressBar.style.width = '0%';
+        updateStatsUI();
+
+        startButton.disabled = true;
+        stopButton.disabled = false;
+        downloadButton.disabled = true;
+        copyJwtButton.disabled = true;
+
+        updateStatus(`Processing ${totalTokens} token(s)...`, '#2563eb');
+        addLog(`Starting refresh for ${totalTokens} token(s)`, 'info');
+
+        const delay = getDelay();
+
+        for (let i = 0; i < tokens.length; i++) {
+            if (stopFlag) break;
+
+            const refreshToken = tokens[i];
+            const index = i;
+
+            try {
+                // ---- 1) Refresh JWT ----
+                addLog(`[${i + 1}/${totalTokens}] Refreshing JWT...`, 'info');
+                const refreshResult = await refreshJWT(refreshToken);
+                const jwt = refreshResult.jwt;
+
+                // Fallback user from refresh response (may be empty)
+                let user = refreshResult.user || {};
+
+                // ---- 2) Fetch user info ----
+                addLog(`[${i + 1}/${totalTokens}] Fetching user info...`, 'info');
+                try {
+                    const infoUser = await fetchUserInfo(jwt);
+                    // Merge: prefer /user/info data, fall back to refresh user
+                    user = { ...user, ...infoUser };
+                    addLog(`  ✓ Info: id=${infoUser.id ?? '—'} | username=${infoUser.username ?? '—'} | kycCompleted=${infoUser.kycCompleted ?? '—'}`, 'success');
+                } catch (infoErr) {
+                    addLog(`  ⚠ User info fetch failed: ${infoErr.message}`, 'warning');
+                }
+
+                const userId   = user.id ?? '—';
+                const username = user.username ?? '—';
+                const kyc      = user.kycCompleted ?? null;
+
+                // ---- 3) Fetch funds ----
+                addLog(`[${i + 1}/${totalTokens}] Fetching funds...`, 'info');
+                let funds = { silvercoins: null, coronas: null, usd: null };
+                try {
+                    funds = await fetchFunds(jwt);
+                } catch (fundsErr) {
+                    addLog(`  ⚠ Funds fetch failed: ${fundsErr.message}`, 'warning');
+                }
+
+                const record = {
+                    index,
+                    refreshToken,
+                    jwt,
+                    userId,
+                    username,
+                    kyc,
+                    coronas: funds.coronas,
+                    usd: funds.usd,
+                    silvercoins: funds.silvercoins,
+                    success: true,
+                    error: null
+                };
+                results.push(record);
+                addRowToTable(record);
+
+                successCount++;
+                addLog(
+                    `  ✓ User: ${username} | ID: ${userId} | KYC: ${kyc}` +
+                    ` | Coronas: ${funds.coronas} | USD: ${funds.usd} | Silver: ${funds.silvercoins}`,
+                    'success'
+                );
+            } catch (err) {
+                const record = {
+                    index,
+                    refreshToken,
+                    jwt: null,
+                    userId: null,
+                    username: null,
+                    kyc: null,
+                    coronas: null,
+                    usd: null,
+                    silvercoins: null,
+                    success: false,
+                    error: err.message
+                };
+                results.push(record);
+                addRowToTable(record);
+
+                failCount++;
+                addLog(`  ✗ Error: ${err.message}`, 'error');
+            }
+
+            processedTokens++;
+            updateStatsUI();
+            progressBar.style.width = `${((i + 1) / totalTokens) * 100}%`;
+
+            if (i < tokens.length - 1 && !stopFlag) {
+                await sleep(delay);
+            }
+        }
+
+        // Done
+        isProcessing = false;
+        startButton.disabled = false;
+        stopButton.disabled = true;
+        downloadButton.disabled = results.length === 0;
+        copyJwtButton.disabled = results.filter(r => r.jwt).length === 0;
+
+        if (stopFlag) {
+            updateStatus(`Stopped. ${successCount} success, ${failCount} failed.`, '#d97706');
+            addLog(`Stopped by user.`, 'warning');
+        } else {
+            updateStatus(`Done! ${successCount} success, ${failCount} failed.`, '#16a34a');
+            addLog(`Processing complete.`, 'success');
+            showNotification(`Complete! ${successCount} success, ${failCount} failed.`, 'success');
+        }
+    }
+
+    // ================= CSV =================
+    function downloadCSV() {
+        if (results.length === 0) {
+            showNotification('No results to download.', 'error');
+            return;
+        }
+
+        const headers = ['#', 'JWT', 'User ID', 'Username', 'KYC', 'Coronas', 'USD', 'Silvercoins', 'Status', 'Error'];
+        let csv = headers.join(',') + '\n';
+
+        for (const r of results) {
+            const row = [
+                r.index + 1,
+                r.jwt || '',
+                r.userId || '',
+                r.username || '',
+                r.kyc === true ? 'Yes' : r.kyc === false ? 'No' : '',
+                r.coronas ?? '',
+                r.usd ?? '',
+                r.silvercoins ?? '',
+                r.success ? 'OK' : 'FAIL',
+                r.error || ''
+            ];
+            const escaped = row.map(v => {
+                const s = String(v);
+                if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+                    return '"' + s.replace(/"/g, '""') + '"';
+                }
+                return s;
+            });
+            csv += escaped.join(',') + '\n';
+        }
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const now = new Date();
+        const stamp = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}h${String(now.getMinutes()).padStart(2, '0')}`;
+        a.download = `jwt_funds_results_${stamp}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showNotification('CSV downloaded.', 'success');
+    }
+
+    // ================= COPY JWTs =================
+    async function copyJWTs() {
+        const jwts = results.filter(r => r.jwt).map(r => r.jwt);
+        if (jwts.length === 0) {
+            showNotification('No JWTs to copy.', 'error');
+            return;
+        }
+        const text = jwts.join('\n');
+        try {
+            await navigator.clipboard.writeText(text);
+            showNotification(`Copied ${jwts.length} JWT(s) to clipboard.`, 'success');
+        } catch (err) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showNotification(`Copied ${jwts.length} JWT(s) to clipboard.`, 'success');
+        }
+    }
+
+    // ================= EVENTS =================
+    startButton.addEventListener('click', startProcessing);
+    stopButton.addEventListener('click', () => {
+        stopFlag = true;
+        stopButton.disabled = true;
+        updateStatus('Stopping...', '#d97706');
+    });
+    downloadButton.addEventListener('click', downloadCSV);
+    copyJwtButton.addEventListener('click', copyJWTs);
+</script>
+</body>
+</html>

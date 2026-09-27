@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achievement Claimer · Multi-Account</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f4f6fa;
+            color: #1e293b;
+        }
+        .nav-bar {
+            background: white;
+            padding: 12px 24px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav-links { display: flex; gap: 12px; flex-wrap: wrap; }
+        .nav-link {
+            padding: 6px 18px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            background: #f1f5f9;
+            color: #1e293b;
+            transition: 0.2s;
+        }
+        .nav-link.active { background: #2563eb; color: white; }
+        .nav-link:hover:not(.active) { background: #e2e8f0; }
+        .server-info { font-size: 0.75rem; color: #64748b; background: #f8fafc; padding: 4px 12px; border-radius: 30px; }
+
+        h1 { font-weight: 600; font-size: 1.8rem; letter-spacing: -0.02em; margin: 0 0 8px 0; display: flex; align-items: center; gap: 10px; }
+        .sub { font-weight: 400; color: #475569; font-size: 1rem; }
+
+        .config-section {
+            background: white;
+            padding: 20px 24px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            border: 1px solid #eef2f6;
+        }
+
+        .tab-buttons {
+            display: flex; gap: 8px; margin: 0 0 16px 0;
+            background: #f8fafc; padding: 6px; border-radius: 60px;
+            width: fit-content; border: 1px solid #eef2f6;
+        }
+        .tab-button {
+            padding: 8px 24px; border: none; border-radius: 40px; font-weight: 600;
+            background: transparent; color: #475569; cursor: pointer; transition: 0.2s;
+            font-size: 0.9rem;
+        }
+        .tab-button.active { background: #2563eb; color: white; box-shadow: 0 2px 8px rgba(37,99,235,0.2); }
+        .tab { display: none; }
+        .tab.active { display: block; }
+
+        .dual-panel { display: flex; gap: 20px; flex-wrap: wrap; }
+        .panel { flex: 1; min-width: 300px; }
+        .panel h3 { margin: 0 0 8px 0; font-size: 0.95rem; font-weight: 600; color: #0f172a; }
+        .panel .hint { font-size: 0.75rem; color: #64748b; margin-bottom: 8px; }
+
+        textarea {
+            width: 100%;
+            height: 180px;
+            padding: 10px 14px;
+            border: 1px solid #d1d9e6;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+            background: white;
+            transition: 0.2s;
+            resize: vertical;
+        }
+        textarea:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+
+        .input-group { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 12px 0; }
+        label { font-weight: 500; font-size: 0.9rem; color: #1e293b; }
+        input[type="number"], input[type="text"] {
+            padding: 8px 14px;
+            border: 1px solid #d1d9e6;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            background: white;
+            transition: 0.2s;
+            width: 110px;
+        }
+        input:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+
+        input[type="file"] {
+            font-size: 0.85rem;
+            padding: 6px 0;
+        }
+
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+            gap: 16px;
+            background: white;
+            padding: 20px 24px;
+            border-radius: 20px;
+            margin: 20px 0;
+            border: 1px solid #eef2f6;
+        }
+        .stat-box { background: #f8fafc; padding: 12px 8px; border-radius: 14px; text-align: center; border-left: 4px solid #2563eb; }
+        .stat-value { font-size: 26px; font-weight: 700; color: #0f172a; }
+        .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; color: #64748b; }
+
+        .button-group { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0 12px; }
+        button {
+            padding: 10px 28px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            background: #e2e8f0;
+            color: #1e293b;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        #startButton { background: #2563eb; color: white; }
+        #startButton:hover:not(:disabled) { background: #1d4ed8; }
+        #pauseButton { background: #f59e0b; color: white; }
+        #pauseButton:hover:not(:disabled) { background: #d97706; }
+        #resumeButton { background: #10b981; color: white; }
+        #resumeButton:hover:not(:disabled) { background: #059669; }
+        #stopButton { background: #ef4444; color: white; }
+        #stopButton:hover:not(:disabled) { background: #dc2626; }
+        #downloadButton { background: #8b5cf6; color: white; }
+        #downloadButton:hover:not(:disabled) { background: #7c3aed; }
+
+        .progress-container { margin: 16px 0; width: 100%; background: #e2e8f0; border-radius: 40px; overflow: hidden; height: 10px; }
+        .progress-bar { height: 100%; background: #2563eb; width: 0%; transition: width 0.25s ease; }
+
+        #statusMessage { margin: 12px 0; font-weight: 500; padding: 8px 16px; background: white; border-radius: 40px; display: inline-block; }
+
+        .table-container {
+            background: white;
+            border-radius: 20px;
+            padding: 8px 0 0 0;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.02);
+            border: 1px solid #eef2f6;
+            overflow-x: auto;
+            margin-top: 24px;
+        }
+        #resultTable { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        #resultTable th {
+            background: #f8fafc;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            padding: 12px 8px;
+            font-weight: 600;
+            color: #1e293b;
+            border-bottom: 2px solid #e2e8f0;
+            white-space: nowrap;
+            text-align: left;
+        }
+        #resultTable td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+        #resultTable tr:hover td { background: #fafcff; }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-error { background: #fee2e2; color: #991b1b; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+        .mono { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
+
+        .log-container {
+            background: white;
+            padding: 15px;
+            border-radius: 20px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            border: 1px solid #eef2f6;
+        }
+        .log-entry {
+            padding: 6px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+        }
+        .log-success { color: #059669; }
+        .log-error { color: #dc2626; }
+        .log-info { color: #2563eb; }
+        .log-warning { color: #d97706; }
+
+        .notification {
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin: 10px 0;
+            display: none;
+            font-weight: 500;
+        }
+        .notification-success { background: #d5f4e6; color: #27ae60; border: 1px solid #a3e4c3; }
+        .notification-error { background: #fadbd8; color: #e74c3c; border: 1px solid #f5b7b1; }
+        .notification-info { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+
+        @media (max-width: 700px) {
+            .dual-panel { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div id="nav-placeholder"></div>
+
+    <h1>🏆 Achievement Claimer <span class="sub">· Multi-Account · Kolex</span></h1>
+
+    <div class="config-section">
+        <div class="tab-buttons">
+            <button class="tab-button active" onclick="switchTab('paste')">Paste Input</button>
+            <button class="tab-button" onclick="switchTab('file')">File Upload</button>
+        </div>
+
+        <!-- PASTE TAB -->
+        <div id="paste-tab" class="tab active">
+            <div class="dual-panel">
+                <div class="panel">
+                    <h3>Auth Tokens (JWTs) <span class="hint">one per line</span></h3>
+                    <textarea id="authTokensTextarea" placeholder="eyJhbGciOi...&#10;eyJhbGciOi...&#10;..."></textarea>
+                </div>
+                <div class="panel">
+                    <h3>Achievement User IDs <span class="hint">one per line, matched by index</span></h3>
+                    <textarea id="userClaimAchivIDsTextarea" placeholder="user-id-1&#10;user-id-2&#10;..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILE TAB -->
+        <div id="file-tab" class="tab">
+            <div class="dual-panel">
+                <div class="panel">
+                    <h3>Upload Auth Tokens File</h3>
+                    <input type="file" id="authTokensFile" accept=".txt,.csv">
+                    <div class="hint" style="margin-top:6px;">Text file, one JWT per line</div>
+                </div>
+                <div class="panel">
+                    <h3>Upload Achievement User IDs File</h3>
+                    <input type="file" id="userClaimAchivIDsFile" accept=".txt,.csv">
+                    <div class="hint" style="margin-top:6px;">Text file, one user ID per line</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-group" style="margin-top:16px;">
+            <label for="batchSizeInput">Batch size:</label>
+            <input type="number" id="batchSizeInput" value="5" min="1" max="20">
+            <label for="delayInput" style="margin-left:12px;">Delay (ms):</label>
+            <input type="number" id="delayInput" value="1000" min="0">
+        </div>
+    </div>
+
+    <div class="stats-panel">
+        <div class="stat-box"><div class="stat-value" id="totalAccounts">0</div><div class="stat-label">Accounts</div></div>
+        <div class="stat-box"><div class="stat-value" id="processedAccounts">0</div><div class="stat-label">Processed</div></div>
+        <div class="stat-box"><div class="stat-value" id="totalClaimed">0</div><div class="stat-label">Rewards Claimed</div></div>
+        <div class="stat-box"><div class="stat-value" id="failCount">0</div><div class="stat-label">Failed Accounts</div></div>
+    </div>
+
+    <div class="button-group">
+        <button id="startButton">▶ Start Claiming</button>
+        <button id="pauseButton" disabled>⏸ Pause</button>
+        <button id="resumeButton" style="display:none;">▶ Resume</button>
+        <button id="stopButton" disabled>⏹ Stop</button>
+        <button id="downloadButton" disabled>⬇ Download Results</button>
+    </div>
+
+    <div id="statusMessage">Ready</div>
+    <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+
+    <div class="notification" id="notification"></div>
+
+    <div class="table-container">
+        <table id="resultTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>User ID</th>
+                    <th>Claimed</th>
+                    <th>Silvercoins</th>
+                    <th>Status</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <div class="log-container" id="logContainer">
+        <div class="log-entry log-info">Ready. Provide auth tokens and achievement user IDs.</div>
+    </div>
+
+<script>
+    // ================= CONFIG =================
+    const PROXY_URL = '/proxy';
+    const ACHIEVEMENTS_URL = id => `https://api.kolex.gg/api/v1/achievements/${id}/user`;
+    const CLAIM_URL = id => `https://api.kolex.gg/api/v1/achievements/${id}/claim/`;
+    const FUNDS_URL = 'https://api.kolex.gg/api/v1/user/funds';
+
+    // ================= STATE =================
+    let isProcessing = false;
+    let isPaused = false;
+    let stopFlag = false;
+    let accountPairs = []; // { token, id }
+    let currentAccountIndex = 0;
+    let totalAccounts = 0;
+    let processedAccounts = 0;
+    let totalClaimed = 0;
+    let failCount = 0;
+    let results = []; // { index, userId, claimed, silvercoins, success, error, details }
+
+    // ================= DOM =================
+    const $ = id => document.getElementById(id);
+    const startButton = $('startButton');
+    const pauseButton = $('pauseButton');
+    const resumeButton = $('resumeButton');
+    const stopButton = $('stopButton');
+    const downloadButton = $('downloadButton');
+    const progressBar = $('progressBar');
+    const statusMessage = $('statusMessage');
+    const tableBody = $('tableBody');
+    const logContainer = $('logContainer');
+    const notification = $('notification');
+    const batchSizeInput = $('batchSizeInput');
+    const delayInput = $('delayInput');
+
+    // ================= HELPERS =================
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+    function getBatchSize() {
+        const v = parseInt(batchSizeInput.value, 10);
+        return isNaN(v) || v < 1 ? 5 : Math.min(v, 20);
+    }
+    function getDelay() {
+        const v = parseInt(delayInput.value, 10);
+        return isNaN(v) || v < 0 ? 1000 : v;
+    }
+    function updateStatus(msg, color = '#1e293b') {
+        statusMessage.textContent = msg;
+        statusMessage.style.color = color;
+    }
+    function showNotification(msg, type = 'success') {
+        notification.textContent = msg;
+        notification.className = `notification notification-${type}`;
+        notification.style.display = 'block';
+        setTimeout(() => { notification.style.display = 'none'; }, 5000);
+    }
+    function addLog(message, type = 'info') {
+        const entry = document.createElement('div');
+        entry.className = `log-entry log-${type}`;
+        entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        logContainer.appendChild(entry);
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+    function updateStatsUI() {
+        $('totalAccounts').textContent = totalAccounts;
+        $('processedAccounts').textContent = processedAccounts;
+        $('totalClaimed').textContent = totalClaimed;
+        $('failCount').textContent = failCount;
+    }
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+        $(tabName + '-tab').classList.add('active');
+        document.querySelector(`.tab-button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+    }
+
+    // ================= PROXY =================
+    async function proxyRequest(endpoint, method = 'GET', headers = {}, data = null) {
+        const res = await fetch(PROXY_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ endpoint, method, headers, data })
+        });
+        if (!res.ok) {
+            const errText = await res.text();
+            throw new Error(`Proxy HTTP ${res.status}: ${errText}`);
+        }
+        return await res.json();
+    }
+
+    // ================= READ FILES =================
+    function readFileAsText(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = e => resolve(e.target.result);
+            reader.onerror = e => reject(e);
+            reader.readAsText(file);
+        });
+    }
+
+    // ================= CORE: PROCESS ONE ACCOUNT =================
+    async function processAccount(authToken, userId) {
+        const headers = {
+            'Content-Type': 'application/json',
+            'x-user-jwt': authToken
+        };
+
+        let claimedForThisAccount = 0;
+        let finalSilver = null;
+        let accountError = null;
+
+        try {
+            // Loop: fetch available -> claim -> repeat until none left
+            let iteration = 0;
+            while (!stopFlag) {
+                while (isPaused && !stopFlag) await sleep(500);
+                if (stopFlag) break;
+
+                iteration++;
+
+                // 1) Fetch achievements
+                let achievementsResp;
+                try {
+                    achievementsResp = await proxyRequest(ACHIEVEMENTS_URL(userId), 'GET', headers, null);
+                } catch (err) {
+                    accountError = `Fetch achievements failed: ${err.message}`;
+                    addLog(`  ✗ ${accountError}`, 'error');
+                    break;
+                }
+
+                // Unwrap
+                let data = achievementsResp;
+                if (data && data.data && data.data.data) data = data.data;
+                const achData = data?.data || data;
+                if (!achData || (!achData.achievements && !achData.daily && !achData.weekly && !achData.monthly)) {
+                    accountError = 'Unexpected achievements response shape';
+                    addLog(`  ✗ ${accountError}`, 'error');
+                    break;
+                }
+
+                // Collect claimable IDs
+                const validIDs = [];
+                const collect = (arr) => {
+                    if (!Array.isArray(arr)) return;
+                    arr.forEach(item => {
+                        if (item?.progress?.claimAvailable === true) validIDs.push(item.id);
+                    });
+                };
+                collect(achData.achievements);
+                collect(achData.daily);
+                collect(achData.weekly);
+                collect(achData.monthly);
+
+                if (validIDs.length === 0) {
+                    // No more to claim -> get funds and finish
+                    try {
+                        const fundsResp = await proxyRequest(FUNDS_URL, 'GET', headers, null);
+                        let fdata = fundsResp;
+                        if (fdata && fdata.data && fdata.data.data) fdata = fdata.data;
+                        const funds = fdata?.data || fdata;
+                        finalSilver = funds?.silvercoins ?? '—';
+                    } catch (err) {
+                        addLog(`  ⚠ Funds fetch failed: ${err.message}`, 'warning');
+                    }
+                    break;
+                }
+
+                addLog(`  ↻ Iteration ${iteration}: ${validIDs.length} claimable reward(s)`, 'info');
+
+                // 2) Claim in batches
+                const batchSize = getBatchSize();
+                for (let i = 0; i < validIDs.length; i += batchSize) {
+                    if (stopFlag) break;
+                    while (isPaused && !stopFlag) await sleep(500);
+                    if (stopFlag) break;
+
+                    const batch = validIDs.slice(i, i + batchSize);
+                    const promises = batch.map(id =>
+                        proxyRequest(CLAIM_URL(id), 'POST', headers, null)
+                            .then(r => ({ id, ok: true, response: r }))
+                            .catch(e => ({ id, ok: false, error: e.message }))
+                    );
+                    const settled = await Promise.all(promises);
+
+                    for (const s of settled) {
+                        if (s.ok) {
+                            claimedForThisAccount++;
+                            totalClaimed++;
+                        } else {
+                            addLog(`  ✗ Claim failed for ID ${s.id}: ${s.error}`, 'error');
+                        }
+                    }
+
+                    updateStatsUI();
+                    await sleep(getDelay());
+                }
+
+                // Safety cap on iterations
+                if (iteration > 20) {
+                    addLog(`  ⚠ Iteration cap reached for user ${userId}`, 'warning');
+                    break;
+                }
+            }
+        } catch (err) {
+            accountError = err.message;
+            addLog(`  ✗ Account error: ${err.message}`, 'error');
+        }
+
+        const record = {
+            index: currentAccountIndex,
+            userId,
+            claimed: claimedForThisAccount,
+            silvercoins: finalSilver,
+            success: !accountError,
+            error: accountError,
+            details: accountError ? accountError : `${claimedForThisAccount} claimed`
+        };
+        results.push(record);
+        addRowToTable(record);
+
+        if (!accountError) {
+            addLog(`  ✓ User ${userId}: ${claimedForThisAccount} claimed | Silver: ${finalSilver ?? '—'}`, 'success');
+        } else {
+            failCount++;
+            updateStatsUI();
+        }
+    }
+
+    // ================= TABLE =================
+    function addRowToTable(r) {
+        const tr = document.createElement('tr');
+
+        const tdIdx = document.createElement('td');
+        tdIdx.textContent = r.index + 1;
+
+        const tdUser = document.createElement('td');
+        tdUser.className = 'mono';
+        tdUser.textContent = r.userId;
+
+        const tdClaimed = document.createElement('td');
+        tdClaimed.textContent = r.claimed;
+
+        const tdSilver = document.createElement('td');
+        tdSilver.textContent = r.silvercoins ?? '—';
+
+        const tdStatus = document.createElement('td');
+        if (r.success) {
+            tdStatus.innerHTML = '<span class="badge badge-success">OK</span>';
+        } else {
+            tdStatus.innerHTML = '<span class="badge badge-error">FAIL</span>';
+        }
+
+        const tdDetails = document.createElement('td');
+        tdDetails.textContent = r.details || '';
+        tdDetails.title = r.error || '';
+        tdDetails.style.maxWidth = '400px';
+        tdDetails.style.overflow = 'hidden';
+        tdDetails.style.textOverflow = 'ellipsis';
+        tdDetails.style.whiteSpace = 'nowrap';
+
+        tr.appendChild(tdIdx);
+        tr.appendChild(tdUser);
+        tr.appendChild(tdClaimed);
+        tr.appendChild(tdSilver);
+        tr.appendChild(tdStatus);
+        tr.appendChild(tdDetails);
+
+        tableBody.appendChild(tr);
+    }
+
+    // ================= MAIN =================
+    async function startProcessing() {
+        if (isProcessing) return;
+
+        // Load inputs
+        const useFile = $('file-tab').classList.contains('active');
+        let tokens = [];
+        let ids = [];
+
+        try {
+            if (useFile) {
+                const tokensFile = $('authTokensFile').files[0];
+                const idsFile = $('userClaimAchivIDsFile').files[0];
+                if (!tokensFile || !idsFile) {
+                    showNotification('Please upload both files.', 'error');
+                    return;
+                }
+                const tokensText = await readFileAsText(tokensFile);
+                const idsText = await readFileAsText(idsFile);
+                tokens = tokensText.split('\n').map(s => s.trim()).filter(Boolean);
+                ids = idsText.split('\n').map(s => s.trim()).filter(Boolean);
+            } else {
+                const tokensText = $('authTokensTextarea').value.trim();
+                const idsText = $('userClaimAchivIDsTextarea').value.trim();
+                if (!tokensText || !idsText) {
+                    showNotification('Please enter both auth tokens and achievement user IDs.', 'error');
+                    return;
+                }
+                tokens = tokensText.split('\n').map(s => s.trim()).filter(Boolean);
+                ids = idsText.split('\n').map(s => s.trim()).filter(Boolean);
+            }
+        } catch (err) {
+            showNotification('Error reading input: ' + err.message, 'error');
+            return;
+        }
+
+        if (tokens.length !== ids.length) {
+            showNotification(`Count mismatch: ${tokens.length} tokens vs ${ids.length} IDs.`, 'error');
+            return;
+        }
+        if (tokens.length === 0) {
+            showNotification('No accounts to process.', 'error');
+            return;
+        }
+
+        accountPairs = tokens.map((token, i) => ({ token, id: ids[i] }));
+
+        // Reset
+        isProcessing = true;
+        isPaused = false;
+        stopFlag = false;
+        totalAccounts = accountPairs.length;
+        processedAccounts = 0;
+        totalClaimed = 0;
+        failCount = 0;
+        currentAccountIndex = 0;
+        results = [];
+        tableBody.innerHTML = '';
+        progressBar.style.width = '0%';
+        updateStatsUI();
+
+        startButton.disabled = true;
+        pauseButton.disabled = false;
+        resumeButton.style.display = 'none';
+        stopButton.disabled = false;
+        downloadButton.disabled = true;
+
+        updateStatus(`Processing ${totalAccounts} account(s)...`, '#2563eb');
+        addLog(`Starting claim for ${totalAccounts} account(s)`, 'info');
+
+        for (let i = 0; i < accountPairs.length; i++) {
+            if (stopFlag) break;
+            while (isPaused && !stopFlag) await sleep(500);
+            if (stopFlag) break;
+
+            currentAccountIndex = i;
+            const pair = accountPairs[i];
+            addLog(`[${i + 1}/${totalAccounts}] User ${pair.id}`, 'info');
+            await processAccount(pair.token, pair.id);
+
+            processedAccounts++;
+            updateStatsUI();
+            progressBar.style.width = `${((i + 1) / totalAccounts) * 100}%`;
+
+            if (i < accountPairs.length - 1 && !stopFlag) await sleep(getDelay());
+        }
+
+        // Done
+        isProcessing = false;
+        startButton.disabled = false;
+        pauseButton.disabled = true;
+        pauseButton.style.display = 'inline-flex';
+        resumeButton.style.display = 'none';
+        stopButton.disabled = true;
+        downloadButton.disabled = results.length === 0;
+
+        if (stopFlag) {
+            updateStatus(`Stopped. ${totalClaimed} claimed, ${failCount} failed.`, '#d97706');
+            addLog(`Stopped by user.`, 'warning');
+        } else {
+            updateStatus(`Done! ${totalClaimed} rewards claimed across ${totalAccounts} account(s).`, '#16a34a');
+            addLog(`Complete. ${totalClaimed} rewards claimed, ${failCount} account(s) failed.`, 'success');
+            showNotification(`Complete! ${totalClaimed} rewards claimed.`, 'success');
+        }
+    }
+
+    // ================= PAUSE / RESUME / STOP =================
+    function pauseProcessing() {
+        isPaused = true;
+        pauseButton.style.display = 'none';
+        resumeButton.style.display = 'inline-flex';
+        addLog('Paused', 'warning');
+        updateStatus('Paused', '#d97706');
+    }
+    function resumeProcessing() {
+        isPaused = false;
+        resumeButton.style.display = 'none';
+        pauseButton.style.display = 'inline-flex';
+        addLog('Resumed', 'info');
+        updateStatus('Resumed', '#2563eb');
+    }
+    function stopProcessing() {
+        stopFlag = true;
+        addLog('Stopping...', 'warning');
+    }
+
+    // ================= DOWNLOAD =================
+    function downloadResults() {
+        if (results.length === 0) {
+            showNotification('No results to download.', 'error');
+            return;
+        }
+
+        let text = 'Achievement Claimer Results\n';
+        text += '===========================\n\n';
+        text += `Total Accounts: ${totalAccounts}\n`;
+        text += `Processed: ${processedAccounts}\n`;
+        text += `Total Rewards Claimed: ${totalClaimed}\n`;
+        text += `Failed Accounts: ${failCount}\n\n`;
+        text += 'Per-Account Details:\n';
+        text += '--------------------\n';
+
+        for (const r of results) {
+            text += `#${r.index + 1} | User: ${r.userId} | Claimed: ${r.claimed} | Silver: ${r.silvercoins ?? '—'} | Status: ${r.success ? 'OK' : 'FAIL'}\n`;
+            if (r.error) text += `   Error: ${r.error}\n`;
+        }
+
+        const now = new Date();
+        const stamp = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}h${String(now.getMinutes()).padStart(2, '0')}`;
+
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `achievement_claim_${stamp}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showNotification('Results downloaded.', 'success');
+    }
+
+    // ================= EVENTS =================
+    startButton.addEventListener('click', startProcessing);
+    pauseButton.addEventListener('click', pauseProcessing);
+    resumeButton.addEventListener('click', resumeProcessing);
+    stopButton.addEventListener('click', stopProcessing);
+    downloadButton.addEventListener('click', downloadResults);
+
+    // ================= NAV LOADER (optional) =================
+    fetch('/nav-loader.js').then(r => r.text()).then(script => {
+        if (script && !script.includes('404')) {
+            const s = document.createElement('script');
+            s.textContent = script;
+            document.head.appendChild(s);
+        }
+    }).catch(() => {});
+</script>
+</body>
+</html>

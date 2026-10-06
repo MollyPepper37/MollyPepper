@@ -29,7 +29,7 @@ async function loadNavigation() {
 
 // Highlight the current page in the navigation
 function highlightCurrentPage() {
-    const currentPage = window.location.pathname.split('/').pop() || 'crafter.html';
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     const links = document.querySelectorAll('.nav-link');
     
     links.forEach(link => {
@@ -62,14 +62,25 @@ function showFallbackNavigation() {
     const fallbackNav = `
         <div class="nav-bar" style="background: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <div class="nav-links" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a href="/refresher.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">refresher</a>
+                <a href="/achiv.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Achievements</a>
+                <a href="/brewer.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Brewer</a>
+                <a href="/brewer2.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Brewer 2</a>
                 <a href="/bundle-buy.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Bundle Buy</a>
                 <a href="/bundle-creator.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Bundle Creator</a>
+                <a href="/bundle-creator-multi.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Bundle Creator Multi</a>
                 <a href="/bundle-list-by-id.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Bundle List by ID</a>
+                <a href="/bundle-list-by-id-multi.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Bundle List by ID Multi</a>
                 <a href="/bundle-price-change.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Bundle Price Change</a>
                 <a href="/bundle-remove-delete.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Bundle Remove/Delete</a>
                 <a href="/crafter.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Card Crafter</a>
                 <a href="/crafter-old.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Card Crafter (Old)</a>
                 <a href="/lister.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Card Lister</a>
+                <a href="/lister-multi-acc.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Card Lister (Multi-Acc)</a>
+                <a href="/market-offers-scan.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Market Offers Scan</a>
+                <a href="/multi-accept-offer.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Multi Accept Offer</a>
+                <a href="/multi-offer-make.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Multi Offer Make</a>
+                <a href="/multi-price-changer.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Multi Price Changer</a>
                 <a href="/pack-buy-open-CS.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Packs buy-open CS</a>
                 <a href="/pack-buy-open-KL.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Packs buy-open KL</a>
                 <a href="/pack-lister.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Pack Lister</a>
@@ -79,8 +90,6 @@ function showFallbackNavigation() {
                 <a href="/scanner.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Collection Scanner</a>
                 <a href="/scanner-old.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Collection Scanner (Old)</a>
                 <a href="/spinner.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">Spinner Pro</a>
-                <a href="/refresher.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">refresher</a>
-                <a href="/achiv.html" class="nav-link" style="padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; background-color: #e0e0e0; color: #333;">achiv</a>
             </div>
             <div class="server-info" style="color: #666; font-size: 12px;">Server: Unknown</div>
         </div>

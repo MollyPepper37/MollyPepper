@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Achievement Claimer · Multi-Account</title>
+    <title>Achievement Claimer - Multi-Account</title>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -228,6 +228,8 @@
     </style>
 </head>
 <body>
+<script src="/nav-loader.js"></script>
+
     <div id="nav-placeholder"></div>
 
     <h1>🏆 Achievement Claimer <span class="sub">· Multi-Account · Kolex</span></h1>
@@ -319,9 +321,9 @@
 <script>
     // ================= CONFIG =================
     const PROXY_URL = '/proxy';
-    const ACHIEVEMENTS_URL = id => `https://api.kolex.gg/api/v1/achievements/${id}/user`;
-    const CLAIM_URL = id => `https://api.kolex.gg/api/v1/achievements/${id}/claim/`;
-    const FUNDS_URL = 'https://api.kolex.gg/api/v1/user/funds';
+const ACHIEVEMENTS_URL = id => `/achievements/${id}/user`;
+const CLAIM_URL = id => `/achievements/${id}/claim/`;
+const FUNDS_URL = '/user/funds';
 
     // ================= STATE =================
     let isProcessing = false;

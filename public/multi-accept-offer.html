@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Market Multi-Offer Acceptor</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 { color: #2c3e50; margin-bottom: 20px; }
+        .config-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        textarea { height: 150px; font-family: monospace; }
+        .dual-panel { display: flex; gap: 20px; margin-top: 10px; }
+        .panel { flex: 1; }
+        .textarea-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .count-badge {
+            background-color: #3498db;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: normal;
+        }
+        .button-group { display: flex; gap: 10px; margin: 20px 0; }
+        button {
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        button:hover { background-color: #2980b9; }
+        button:disabled { background-color: #95a5a6; cursor: not-allowed; }
+        .button-stop { background-color: #e74c3c; }
+        .button-stop:hover { background-color: #c0392b; }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .stat-item { text-align: center; flex: 1; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #3498db; }
+        .stat-label { font-size: 14px; color: #7f8c8d; }
+        .log-container {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .log-entry {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        .log-success { color: #27ae60; }
+        .log-error { color: #e74c3c; }
+        .log-info { color: #3498db; }
+        .log-warning { color: #f39c12; }
+        .progress-container {
+            width: 100%;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #2ecc71;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .notification {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: none;
+        }
+        .notification-success {
+            background-color: #d5f4e6;
+            color: #27ae60;
+            border: 1px solid #a3e4c3;
+        }
+        .notification-error {
+            background-color: #fadbd8;
+            color: #e74c3c;
+            border: 1px solid #f5b7b1;
+        }
+        .tab-buttons { display: flex; margin-bottom: 10px; }
+        .tab-button {
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+        .tab-button.active {
+            background: white;
+            border-bottom: none;
+            font-weight: bold;
+        }
+        .tab { display: none; }
+        .tab.active { display: block; }
+        .match-status {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .match-success { background-color: #d5f4e6; color: #27ae60; }
+        .match-warning { background-color: #fef9e7; color: #f39c12; }
+        .small-note { font-size: 12px; color: #7f8c8d; margin-top: 5px; }
+        .market-id-list {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px dashed #27ae60;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Market Multi-Offer Acceptor</h1>
+
+    <div class="config-section">
+        <h2>Configuration</h2>
+
+        <label for="DELAY_BETWEEN_REQUESTS">Delay ms:</label>
+        <input type="number" id="DELAY_BETWEEN_REQUESTS" value="2100" />
+
+        <label>Input Method:</label>
+        <div class="tab-buttons">
+            <button class="tab-button active" onclick="switchTab('paste')">Paste Data</button>
+            <button class="tab-button" onclick="switchTab('file')">Upload Files</button>
+        </div>
+
+        <!-- PASTE TAB -->
+        <div id="paste-tab" class="tab active">
+            <div class="dual-panel">
+                <div class="panel">
+                    <div class="textarea-label">
+                        <label for="jwtsTextarea">JWT Tokens (one per line):</label>
+                        <span id="jwtsCount" class="count-badge">0 JWTs</span>
+                    </div>
+                    <textarea id="jwtsTextarea" placeholder="Enter JWT tokens here, one per line.
+If only 1 is provided, it will be used for all offers.
+If more, each JWT applies to its corresponding offer (by index).
+Example:
+eyJhbGciOi...
+eyJhbGciOi...
+..."></textarea>
+                    <div class="small-note">Last JWT repeats if fewer than offers.</div>
+                </div>
+
+                <div class="panel">
+                    <div class="textarea-label">
+                        <label for="marketIdsTextarea">Market IDs (one per line):</label>
+                        <span id="marketIdsCount" class="count-badge">0 IDs</span>
+                    </div>
+                    <textarea id="marketIdsTextarea" placeholder="Enter market IDs here, one per line. Can be any market listing (card, pack, bundle, etc.)
+Example:
+24718
+24719
+24720
+..."></textarea>
+                    <div class="small-note">The listing you're accepting an offer on.</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 15px;">
+                <div class="textarea-label">
+                    <label for="offerIdsTextarea">Offer IDs (one per line, paired with Market IDs):</label>
+                    <span id="offerIdsCount" class="count-badge">0 offer IDs</span>
+                </div>
+                <textarea id="offerIdsTextarea" placeholder="Enter offer IDs here, one per line. Each offer ID corresponds to the market ID on the same line.
+Example:
+1001
+1002
+1003
+..."></textarea>
+                <div class="small-note">The specific offer to accept on each market. Last repeats if fewer than markets.</div>
+            </div>
+        </div>
+
+        <!-- FILE TAB -->
+        <div id="file-tab" class="tab">
+            <div class="dual-panel">
+                <div class="panel">
+                    <label for="jwtsFile">Upload JWTs File:</label>
+                    <input type="file" id="jwtsFile" accept=".txt,.csv" />
+                    <div class="small-note">Text file with one JWT per line</div>
+                </div>
+
+                <div class="panel">
+                    <label for="marketIdsFile">Upload Market IDs File:</label>
+                    <input type="file" id="marketIdsFile" accept=".txt,.csv" />
+                    <div class="small-note">Text file with one market ID per line</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 15px;">
+                <div class="panel">
+                    <label for="offerIdsFile">Upload Offer IDs File:</label>
+                    <input type="file" id="offerIdsFile" accept=".txt,.csv" />
+                    <div class="small-note">Text file with one offer ID per line</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="matchStatus" class="match-status match-success" style="display: none;"></div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-item">
+            <div class="stat-value" id="totalAccepts">0</div>
+            <div class="stat-label">Total Accepts</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="processedAccepts">0</div>
+            <div class="stat-label">Processed</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="successfulAccepts">0</div>
+            <div class="stat-label">Successful</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="failedAccepts">0</div>
+            <div class="stat-label">Failed</div>
+        </div>
+    </div>
+
+    <div class="progress-container" style="display: none;" id="progressContainer">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="button-group">
+        <button id="startButton">Start Accepting Offers</button>
+        <button id="pauseButton" style="display: none;">Pause</button>
+        <button id="resumeButton" style="display: none;">Resume</button>
+        <button id="downloadButton">Download Results</button>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <div class="log-container" id="logContainer">
+        <div class="log-entry log-info">Ready to start. Configure JWTs, market IDs, and offer IDs.</div>
+    </div>
+
+    <div class="config-section" id="acceptsContainer" style="display: none;">
+        <h2>Accepted Offers</h2>
+        <div class="stats" style="margin-top: 0;">
+            <div class="stat-item">
+                <div class="stat-value" id="totalAcceptedIds">0</div>
+                <div class="stat-label">Total Accepted</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <h3>Accepted offers:</h3>
+            <div class="market-id-list" id="acceptList">
+                No offers accepted yet
+            </div>
+        </div>
+    </div>
+
+<script src="/nav-loader.js"></script>
+<script>
+    // Configuration
+    const PROXY_URL = '/proxy';
+    const ACCEPT_ENDPOINT = '/market/counter-offers/accept';
+
+    // Global variables
+    let DELAY_BETWEEN_REQUESTS = 2100;
+
+    // State
+    let isProcessing = false;
+    let isPaused = false;
+    let jwts = [];
+    let marketIds = [];
+    let offerIds = [];
+    let currentIndex = 0;
+    let totalAccepts = 0;
+    let processedAccepts = 0;
+    let successfulAccepts = 0;
+    let failedAccepts = 0;
+    let results = [];
+
+    // DOM
+    const startButton = document.getElementById('startButton');
+    const pauseButton = document.getElementById('pauseButton');
+    const resumeButton = document.getElementById('resumeButton');
+    const downloadButton = document.getElementById('downloadButton');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const logContainer = document.getElementById('logContainer');
+    const notification = document.getElementById('notification');
+    const matchStatus = document.getElementById('matchStatus');
+
+    const acceptsContainer = document.getElementById('acceptsContainer');
+    const acceptList = document.getElementById('acceptList');
+    const totalAcceptedIds = document.getElementById('totalAcceptedIds');
+
+    // ============ Helpers ============
+    function getCurrentDelay() {
+        const v = parseInt(document.getElementById('DELAY_BETWEEN_REQUESTS').value, 10);
+        return isNaN(v) || v < 0 ? 2100 : v;
+    }
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    function parseLines(text) {
+        if (!text || !text.trim()) return [];
+        return text.split('\n').map(l => l.trim()).filter(l => l !== '');
+    }
+
+    // ============ Proxy ============
+    async function sendProxyRequest(endpoint, method = 'GET', headers = {}, data = null) {
+        const response = await fetch(PROXY_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ endpoint, method, headers, data })
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP ${response.status} - ${errorText}`);
+        }
+        return await response.json();
+    }
+
+    // ============ Init ============
+    document.addEventListener('DOMContentLoaded', function() {
+        DELAY_BETWEEN_REQUESTS = getCurrentDelay();
+
+        document.getElementById('DELAY_BETWEEN_REQUESTS').addEventListener('change', function() {
+            if (!isProcessing) DELAY_BETWEEN_REQUESTS = getCurrentDelay();
+        });
+
+        startButton.addEventListener('click', startProcessing);
+        pauseButton.addEventListener('click', pauseProcessing);
+        resumeButton.addEventListener('click', resumeProcessing);
+        downloadButton.addEventListener('click', downloadResults);
+
+        document.getElementById('jwtsTextarea').addEventListener('input', updateStats);
+        document.getElementById('marketIdsTextarea').addEventListener('input', updateStats);
+        document.getElementById('offerIdsTextarea').addEventListener('input', updateStats);
+
+        document.getElementById('jwtsFile').addEventListener('change', handleJwtsFileUpload);
+        document.getElementById('marketIdsFile').addEventListener('change', handleMarketIdsFileUpload);
+        document.getElementById('offerIdsFile').addEventListener('change', handleOfferIdsFileUpload);
+
+        updateStats();
+    });
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.tab-button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(tabName + '-tab').classList.add('active');
+        updateStats();
+    }
+
+    async function readFileAsText(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = e => resolve(e.target.result);
+            reader.onerror = e => reject(e);
+            reader.readAsText(file);
+        });
+    }
+
+    async function handleJwtsFileUpload() {
+        const file = document.getElementById('jwtsFile').files[0];
+        if (!file) return;
+        try {
+            document.getElementById('jwtsTextarea').value = await readFileAsText(file);
+            updateStats();
+            showNotification('JWTs file loaded.', 'success');
+        } catch (e) { showNotification('Error reading file: ' + e.message, 'error'); }
+    }
+
+    async function handleMarketIdsFileUpload() {
+        const file = document.getElementById('marketIdsFile').files[0];
+        if (!file) return;
+        try {
+            document.getElementById('marketIdsTextarea').value = await readFileAsText(file);
+            updateStats();
+            showNotification('Market IDs file loaded.', 'success');
+        } catch (e) { showNotification('Error reading file: ' + e.message, 'error'); }
+    }
+
+    async function handleOfferIdsFileUpload() {
+        const file = document.getElementById('offerIdsFile').files[0];
+        if (!file) return;
+        try {
+            document.getElementById('offerIdsTextarea').value = await readFileAsText(file);
+            updateStats();
+            showNotification('Offer IDs file loaded.', 'success');
+        } catch (e) { showNotification('Error reading file: ' + e.message, 'error'); }
+    }
+
+    // ============ Stats & match status ============
+    function updateStats() {
+        jwts = parseLines(document.getElementById('jwtsTextarea').value);
+        marketIds = parseLines(document.getElementById('marketIdsTextarea').value);
+        offerIds = parseLines(document.getElementById('offerIdsTextarea').value);
+
+        totalAccepts = marketIds.length;
+        processedAccepts = 0;
+        successfulAccepts = 0;
+        failedAccepts = 0;
+
+        document.getElementById('totalAccepts').textContent = totalAccepts;
+        document.getElementById('processedAccepts').textContent = processedAccepts;
+        document.getElementById('successfulAccepts').textContent = successfulAccepts;
+        document.getElementById('failedAccepts').textContent = failedAccepts;
+
+        document.getElementById('jwtsCount').textContent = `${jwts.length} JWTs`;
+        document.getElementById('marketIdsCount').textContent = `${marketIds.length} IDs`;
+        document.getElementById('offerIdsCount').textContent = `${offerIds.length} offer IDs`;
+
+        if (totalAccepts > 0) {
+            const warnings = [];
+
+            if (jwts.length === 0) {
+                warnings.push('⚠️ No JWT provided. Please enter at least one JWT.');
+            } else if (jwts.length < totalAccepts) {
+                warnings.push(`⚠️ Only ${jwts.length} JWT(s) for ${totalAccepts} accept(s). Last JWT will be repeated.`);
+            } else if (jwts.length > totalAccepts) {
+                warnings.push(`⚠️ ${jwts.length} JWTs but only ${totalAccepts} accept(s). Extra ignored.`);
+            }
+
+            if (offerIds.length === 0) {
+                warnings.push('⚠️ No offer IDs provided. Please enter offer IDs.');
+            } else if (offerIds.length < totalAccepts) {
+                warnings.push(`⚠️ Only ${offerIds.length} offer ID(s). Last "${offerIds[offerIds.length-1]}" will be repeated.`);
+            } else if (offerIds.length > totalAccepts) {
+                warnings.push(`⚠️ ${offerIds.length} offer IDs but only ${totalAccepts} accept(s). Extra ignored.`);
+            }
+
+            if (warnings.length > 0) {
+                matchStatus.style.display = 'block';
+                matchStatus.className = 'match-status match-warning';
+                matchStatus.innerHTML = warnings.join('<br>');
+            } else {
+                matchStatus.style.display = 'block';
+                matchStatus.className = 'match-status match-success';
+                matchStatus.innerHTML = '✅ Perfect match! JWTs and offer IDs align with market IDs.';
+            }
+        } else {
+            matchStatus.style.display = 'none';
+        }
+    }
+
+    // ============ Repeat-last-value getters ============
+    function getJwtForIndex(i) {
+        if (jwts.length === 0) return '';
+        return i < jwts.length ? jwts[i] : jwts[jwts.length - 1];
+    }
+    function getOfferIdForIndex(i) {
+        if (offerIds.length === 0) return '';
+        return i < offerIds.length ? offerIds[i] : offerIds[offerIds.length - 1];
+    }
+
+    // ============ Main flow ============
+    async function startProcessing() {
+        if (isProcessing) { stopProcessing(); return; }
+
+        DELAY_BETWEEN_REQUESTS = getCurrentDelay();
+        updateStats();
+
+        if (jwts.length === 0) { showNotification('Please enter at least one JWT token', 'error'); return; }
+        if (totalAccepts === 0) { showNotification('No market IDs found.', 'error'); return; }
+        if (offerIds.length === 0) { showNotification('Please enter at least one offer ID', 'error'); return; }
+
+        isProcessing = true;
+        isPaused = false;
+        currentIndex = 0;
+        results = [];
+        processedAccepts = 0;
+        successfulAccepts = 0;
+        failedAccepts = 0;
+
+        startButton.textContent = 'Stop Processing';
+        startButton.classList.add('button-stop');
+        pauseButton.style.display = 'inline-block';
+        resumeButton.style.display = 'none';
+        progressContainer.style.display = 'block';
+        progressBar.style.width = '0%';
+        acceptsContainer.style.display = 'none';
+
+        logContainer.innerHTML = '';
+        addLog('Starting to accept offers...', 'info');
+        addLog(`Accepts: ${totalAccepts} | JWTs: ${jwts.length} | OfferIDs: ${offerIds.length}`, 'info');
+        addLog(`Delay between requests: ${DELAY_BETWEEN_REQUESTS}ms`, 'info');
+
+        if (jwts.length < totalAccepts) addLog(`Note: Last JWT will be repeated for remaining accepts.`, 'warning');
+        if (offerIds.length < totalAccepts) addLog(`Note: Last offer ID "${offerIds[offerIds.length-1]}" will be repeated.`, 'warning');
+
+        await processAccepts();
+    }
+
+    function stopProcessing() {
+        isProcessing = false;
+        startButton.textContent = 'Start Accepting Offers';
+        startButton.classList.remove('button-stop');
+        pauseButton.style.display = 'none';
+        resumeButton.style.display = 'none';
+        addLog('Processing stopped by user', 'info');
+    }
+
+    function pauseProcessing() {
+        isPaused = true;
+        pauseButton.style.display = 'none';
+        resumeButton.style.display = 'inline-block';
+        addLog('Processing paused', 'info');
+    }
+
+    function resumeProcessing() {
+        isPaused = false;
+        resumeButton.style.display = 'none';
+        pauseButton.style.display = 'inline-block';
+        addLog('Processing resumed', 'info');
+    }
+
+    async function processAccepts() {
+        for (let i = currentIndex; i < totalAccepts && isProcessing; i++) {
+            while (isPaused && isProcessing) { await sleep(500); }
+            if (!isProcessing) break;
+
+            currentIndex = i;
+            const marketId = marketIds[i];
+            const offerId = getOfferIdForIndex(i);
+            const jwtToken = getJwtForIndex(i);
+            const jwtIndex = Math.min(i, jwts.length - 1);
+
+            addLog(`Accept ${i + 1}/${totalAccepts} → marketId ${marketId}, offerId ${offerId} (JWT #${jwtIndex + 1})...`, 'info');
+
+            try {
+                const result = await acceptOffer(marketId, jwtToken, offerId);
+
+                if (result.success) {
+                    successfulAccepts++;
+                    addLog(`✓ Accepted offer ${offerId} on market ${marketId} (JWT #${jwtIndex + 1})`, 'success');
+                    results.push({
+                        marketId,
+                        offerId,
+                        jwtIndex,
+                        success: true,
+                        timestamp: new Date().toISOString()
+                    });
+                } else {
+                    failedAccepts++;
+                    addLog(`✗ Failed to accept offer ${offerId} on market ${marketId}: ${result.error}`, 'error');
+                    results.push({
+                        marketId,
+                        offerId,
+                        jwtIndex,
+                        success: false,
+                        error: result.error,
+                        timestamp: new Date().toISOString()
+                    });
+                }
+            } catch (error) {
+                failedAccepts++;
+                addLog(`✗ Error accepting offer ${offerId} on ${marketId}: ${error.message}`, 'error');
+                results.push({
+                    marketId,
+                    offerId,
+                    jwtIndex,
+                    success: false,
+                    error: error.message,
+                    timestamp: new Date().toISOString()
+                });
+            }
+
+            processedAccepts++;
+            document.getElementById('processedAccepts').textContent = processedAccepts;
+            document.getElementById('successfulAccepts').textContent = successfulAccepts;
+            document.getElementById('failedAccepts').textContent = failedAccepts;
+
+            progressBar.style.width = `${((i + 1) / totalAccepts) * 100}%`;
+
+            if (i < totalAccepts - 1 && isProcessing) {
+                addLog(`Waiting ${DELAY_BETWEEN_REQUESTS/1000}s...`, 'info');
+                await sleep(DELAY_BETWEEN_REQUESTS);
+            }
+        }
+
+        if (isProcessing) {
+            isProcessing = false;
+            startButton.textContent = 'Start Accepting Offers';
+            startButton.classList.remove('button-stop');
+            pauseButton.style.display = 'none';
+            resumeButton.style.display = 'none';
+
+            displayAccepts();
+
+            addLog(`Processing complete. Success: ${successfulAccepts}, Failed: ${failedAccepts}.`, 'info');
+            showNotification(`Accepts complete! ${successfulAccepts} successful, ${failedAccepts} failed.`, 'success');
+        }
+    }
+
+    // ============ PATCH single accept ============
+    async function acceptOffer(marketId, jwtToken, offerId) {
+        const headers = {
+            'Content-Type': 'application/json',
+            'x-user-jwt': jwtToken
+        };
+
+        const body = {
+            marketId: parseInt(marketId),
+            offerId: offerId
+        };
+
+        const response = await sendProxyRequest(ACCEPT_ENDPOINT, 'PATCH', headers, body);
+
+        // Unwrap success in any nesting shape
+        const isSuccess = (obj) => {
+            if (!obj || typeof obj !== 'object') return false;
+            if (obj.success === true) return true;
+            if (obj.data && isSuccess(obj.data)) return true;
+            return false;
+        };
+
+        if (isSuccess(response)) return { success: true };
+
+        const errorMsg =
+            response?.error ||
+            response?.details?.message ||
+            response?.data?.error ||
+            'Failed to accept offer';
+        return { success: false, error: errorMsg };
+    }
+
+    // ============ Accepts summary UI ============
+    function displayAccepts() {
+        const successful = results.filter(r => r.success);
+        if (successful.length === 0) {
+            acceptsContainer.style.display = 'none';
+            return;
+        }
+
+        acceptsContainer.style.display = 'block';
+        totalAcceptedIds.textContent = successful.length;
+
+        let detailedHtml = '<div style="margin-bottom: 15px;">';
+        detailedHtml += '<table style="width: 100%; border-collapse: collapse;">';
+        detailedHtml += '<thead><tr style="background-color: #f2f2f2;">' +
+            '<th style="padding: 8px; text-align: left; border-bottom: 2px solid #ddd;">#</th>' +
+            '<th style="padding: 8px; text-align: left; border-bottom: 2px solid #ddd;">Market ID</th>' +
+            '<th style="padding: 8px; text-align: left; border-bottom: 2px solid #ddd;">Offer ID</th>' +
+            '<th style="padding: 8px; text-align: left; border-bottom: 2px solid #ddd;">JWT #</th>' +
+            '</tr></thead><tbody>';
+
+        successful.forEach((item, index) => {
+            detailedHtml += `<tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 8px;">${index + 1}</td>
+                <td style="padding: 8px; font-family: monospace;">${item.marketId}</td>
+                <td style="padding: 8px; font-family: monospace; color: #27ae60; font-weight: bold;">${item.offerId}</td>
+                <td style="padding: 8px;">${(item.jwtIndex ?? 0) + 1}</td>
+            </tr>`;
+        });
+
+        detailedHtml += '</tbody></table></div>';
+
+        acceptList.innerHTML = detailedHtml;
+        addLog(`✅ ${successful.length} offers accepted`, 'success');
+    }
+
+    // ============ UI helpers ============
+    function addLog(message, type = 'info') {
+        const entry = document.createElement('div');
+        entry.className = `log-entry log-${type}`;
+        entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        logContainer.appendChild(entry);
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    function showNotification(message, type = 'info') {
+        notification.textContent = message;
+        notification.className = `notification notification-${type}`;
+        notification.style.display = 'block';
+        setTimeout(() => { notification.style.display = 'none'; }, 5000);
+    }
+
+    function downloadResults() {
+        if (results.length === 0) {
+            showNotification('No results to download', 'error');
+            return;
+        }
+
+        let text = 'Market Multi-Offer Accept Results\n';
+        text += '==================================\n\n';
+        text += `Total Accepts: ${totalAccepts}\n`;
+        text += `JWTs used: ${jwts.length}\n`;
+        text += `Successfully Accepted: ${successfulAccepts}\n`;
+        text += `Failed: ${failedAccepts}\n`;
+        text += `Processed: ${processedAccepts}\n\n`;
+        text += 'Detailed Results:\n';
+        text += '-----------------\n';
+
+        results.forEach((r, i) => {
+            text += `${i + 1}. Market ID: ${r.marketId}\n`;
+            text += `   Offer ID: ${r.offerId}\n`;
+            text += `   JWT #: ${(r.jwtIndex ?? 0) + 1}\n`;
+            text += `   Status: ${r.success ? 'SUCCESS' : 'FAILED'}\n`;
+            text += `   Timestamp: ${r.timestamp}\n`;
+            if (r.error) text += `   Error: ${r.error}\n`;
+            text += '\n';
+        });
+
+        const now = new Date();
+        const stamp = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}h${String(now.getMinutes()).padStart(2,'0')}`;
+
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `multi_accepts_${stamp}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showNotification('Results downloaded successfully!', 'success');
+    }
+</script>
+</body>
+</html>

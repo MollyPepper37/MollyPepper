@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Listings Multi-Price Changer w offers</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 { color: #2c3e50; margin-bottom: 20px; }
+        .config-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        textarea { height: 150px; font-family: monospace; }
+        .dual-panel { display: flex; gap: 20px; margin-top: 10px; }
+        .panel { flex: 1; }
+        .textarea-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .count-badge {
+            background-color: #3498db;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: normal;
+        }
+        .button-group { display: flex; gap: 10px; margin: 20px 0; }
+        button {
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        button:hover { background-color: #2980b9; }
+        button:disabled { background-color: #95a5a6; cursor: not-allowed; }
+        .button-stop { background-color: #e74c3c; }
+        .button-stop:hover { background-color: #c0392b; }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .stat-item { text-align: center; flex: 1; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #3498db; }
+        .stat-label { font-size: 14px; color: #7f8c8d; }
+        .log-container {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .log-entry {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        .log-success { color: #27ae60; }
+        .log-error { color: #e74c3c; }
+        .log-info { color: #3498db; }
+        .log-warning { color: #f39c12; }
+        .progress-container {
+            width: 100%;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #2ecc71;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .notification {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: none;
+        }
+        .notification-success {
+            background-color: #d5f4e6;
+            color: #27ae60;
+            border: 1px solid #a3e4c3;
+        }
+        .notification-error {
+            background-color: #fadbd8;
+            color: #e74c3c;
+            border: 1px solid #f5b7b1;
+        }
+        .tab-buttons { display: flex; margin-bottom: 10px; }
+        .tab-button {
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+        .tab-button.active {
+            background: white;
+            border-bottom: none;
+            font-weight: bold;
+        }
+        .tab { display: none; }
+        .tab.active { display: block; }
+        .match-status {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .match-success { background-color: #d5f4e6; color: #27ae60; }
+        .match-warning { background-color: #fef9e7; color: #f39c12; }
+        .small-note { font-size: 12px; color: #7f8c8d; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Bundle Market Multi-Price Changer</h1>
+
+    <div class="config-section">
+        <h2>Configuration</h2>
+
+        <label for="DELAY_BETWEEN_REQUESTS">Delay ms:</label>
+        <input type="number" id="DELAY_BETWEEN_REQUESTS" value="2000" />
+
+        <label>Input Method:</label>
+        <div class="tab-buttons">
+            <button class="tab-button active" onclick="switchTab('paste')">Paste Data</button>
+            <button class="tab-button" onclick="switchTab('file')">Upload Files</button>
+        </div>
+
+        <!-- PASTE TAB -->
+        <div id="paste-tab" class="tab active">
+            <div class="dual-panel">
+                <div class="panel">
+                    <div class="textarea-label">
+                        <label for="jwtsTextarea">JWT Tokens (one per line):</label>
+                        <span id="jwtsCount" class="count-badge">0 JWTs</span>
+                    </div>
+                    <textarea id="jwtsTextarea" placeholder="Enter JWT tokens here, one per line.
+If only 1 is provided, it will be used for all listings.
+If more, each JWT applies to its corresponding listing (by index).
+Example:
+eyJhbGciOi...
+eyJhbGciOi...
+..."></textarea>
+                    <div class="small-note">Last JWT repeats if fewer than listings.</div>
+                </div>
+
+                <div class="panel">
+                    <div class="textarea-label">
+                        <label for="listingIdsTextarea">Market Listing IDs (one per line):</label>
+                        <span id="listingIdsCount" class="count-badge">0 IDs</span>
+                    </div>
+                    <textarea id="listingIdsTextarea" placeholder="Enter market listing IDs here, one per line. Example:
+24718
+24719
+24720
+..."></textarea>
+                    <div class="small-note">These are the listing IDs from the market, not bundle IDs.</div>
+                </div>
+            </div>
+
+            <div class="dual-panel" style="margin-top: 15px;">
+                <div class="panel">
+                    <div class="textarea-label">
+                        <label for="pricesTextarea">New Prices (one per line):</label>
+                        <span id="pricesCount" class="count-badge">0 prices</span>
+                    </div>
+                    <textarea id="pricesTextarea" placeholder="Enter new prices here, one per line. Example:
+2.05
+3.50
+1.75
+..."></textarea>
+                    <div class="small-note">Last price repeats if fewer than listings.</div>
+                </div>
+
+                <div class="panel">
+                    <div class="textarea-label">
+                        <label for="minOffersTextarea">Min Offers (one per line):</label>
+                        <span id="minOffersCount" class="count-badge">0 min offers</span>
+                    </div>
+                    <textarea id="minOffersTextarea" placeholder="Enter min offer values here, one per line. Example:
+0.1
+0.1
+0.5
+..."></textarea>
+                    <div class="small-note">Last min offer repeats if fewer than listings.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILE TAB -->
+        <div id="file-tab" class="tab">
+            <div class="dual-panel">
+                <div class="panel">
+                    <label for="jwtsFile">Upload JWTs File:</label>
+                    <input type="file" id="jwtsFile" accept=".txt,.csv" />
+                    <div class="small-note">Text file with one JWT per line</div>
+                </div>
+
+                <div class="panel">
+                    <label for="listingIdsFile">Upload Listing IDs File:</label>
+                    <input type="file" id="listingIdsFile" accept=".txt,.csv" />
+                    <div class="small-note">Text file with one listing ID per line</div>
+                </div>
+            </div>
+
+            <div class="dual-panel" style="margin-top: 15px;">
+                <div class="panel">
+                    <label for="pricesFile">Upload Prices File:</label>
+                    <input type="file" id="pricesFile" accept=".txt,.csv" />
+                    <div class="small-note">Text file with one price per line</div>
+                </div>
+
+                <div class="panel">
+                    <label for="minOffersFile">Upload Min Offers File:</label>
+                    <input type="file" id="minOffersFile" accept=".txt,.csv" />
+                    <div class="small-note">Text file with one min offer per line</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="matchStatus" class="match-status match-success" style="display: none;"></div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-item">
+            <div class="stat-value" id="totalListings">0</div>
+            <div class="stat-label">Total Listings</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="processedListings">0</div>
+            <div class="stat-label">Processed</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="successfulUpdates">0</div>
+            <div class="stat-label">Successful</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="failedUpdates">0</div>
+            <div class="stat-label">Failed</div>
+        </div>
+    </div>
+
+    <div class="progress-container" style="display: none;" id="progressContainer">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="button-group">
+        <button id="startButton">Start Updating Prices</button>
+        <button id="pauseButton" style="display: none;">Pause</button>
+        <button id="resumeButton" style="display: none;">Resume</button>
+        <button id="downloadButton">Download Results</button>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <div class="log-container" id="logContainer">
+        <div class="log-entry log-info">Ready to start. Configure JWTs, listing IDs, new prices, and min offers.</div>
+    </div>
+
+<script src="/nav-loader.js"></script>
+<script>
+    // Configuration
+    const PROXY_URL = '/proxy';
+    const MARKET_LISTED_ENDPOINT = id => `/market/listed/${id}`;
+
+    // Global variables
+    let DELAY_BETWEEN_REQUESTS = 2000;
+
+    // State
+    let isProcessing = false;
+    let isPaused = false;
+    let jwts = [];
+    let listingIds = [];
+    let prices = [];
+    let minOffers = [];
+    let currentIndex = 0;
+    let totalListings = 0;
+    let processedListings = 0;
+    let successfulUpdates = 0;
+    let failedUpdates = 0;
+    let results = [];
+
+    // DOM
+    const startButton = document.getElementById('startButton');
+    const pauseButton = document.getElementById('pauseButton');
+    const resumeButton = document.getElementById('resumeButton');
+    const downloadButton = document.getElementById('downloadButton');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const logContainer = document.getElementById('logContainer');
+    const notification = document.getElementById('notification');
+    const matchStatus = document.getElementById('matchStatus');
+
+    // ============ Helpers ============
+    function getCurrentDelay() {
+        const v = parseInt(document.getElementById('DELAY_BETWEEN_REQUESTS').value, 10);
+        return isNaN(v) || v < 0 ? 2000 : v;
+    }
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    function parseLines(text) {
+        if (!text || !text.trim()) return [];
+        return text.split('\n').map(l => l.trim()).filter(l => l !== '');
+    }
+
+    // ============ Proxy ============
+    async function sendProxyRequest(endpoint, method = 'GET', headers = {}, data = null) {
+        const response = await fetch(PROXY_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ endpoint, method, headers, data })
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP ${response.status} - ${errorText}`);
+        }
+        return await response.json();
+    }
+
+    // ============ Init ============
+    document.addEventListener('DOMContentLoaded', function() {
+        DELAY_BETWEEN_REQUESTS = getCurrentDelay();
+
+        document.getElementById('DELAY_BETWEEN_REQUESTS').addEventListener('change', function() {
+            if (!isProcessing) DELAY_BETWEEN_REQUESTS = getCurrentDelay();
+        });
+
+        startButton.addEventListener('click', startProcessing);
+        pauseButton.addEventListener('click', pauseProcessing);
+        resumeButton.addEventListener('click', resumeProcessing);
+        downloadButton.addEventListener('click', downloadResults);
+
+        document.getElementById('jwtsTextarea').addEventListener('input', updateStats);
+        document.getElementById('listingIdsTextarea').addEventListener('input', updateStats);
+        document.getElementById('pricesTextarea').addEventListener('input', updateStats);
+        document.getElementById('minOffersTextarea').addEventListener('input', updateStats);
+
+        document.getElementById('jwtsFile').addEventListener('change', handleJwtsFileUpload);
+        document.getElementById('listingIdsFile').addEventListener('change', handleListingIdsFileUpload);
+        document.getElementById('pricesFile').addEventListener('change', handlePricesFileUpload);
+        document.getElementById('minOffersFile').addEventListener('change', handleMinOffersFileUpload);
+
+        updateStats();
+    });
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.tab-button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(tabName + '-tab').classList.add('active');
+        updateStats();
+    }
+
+    async function readFileAsText(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = e => resolve(e.target.result);
+            reader.onerror = e => reject(e);
+            reader.readAsText(file);
+        });
+    }
+
+    async function handleJwtsFileUpload() {
+        const file = document.getElementById('jwtsFile').files[0];
+        if (!file) return;
+        try {
+            document.getElementById('jwtsTextarea').value = await readFileAsText(file);
+            updateStats();
+            showNotification('JWTs file loaded.', 'success');
+        } catch (e) { showNotification('Error reading file: ' + e.message, 'error'); }
+    }
+
+    async function handleListingIdsFileUpload() {
+        const file = document.getElementById('listingIdsFile').files[0];
+        if (!file) return;
+        try {
+            document.getElementById('listingIdsTextarea').value = await readFileAsText(file);
+            updateStats();
+            showNotification('Listing IDs file loaded.', 'success');
+        } catch (e) { showNotification('Error reading file: ' + e.message, 'error'); }
+    }
+
+    async function handlePricesFileUpload() {
+        const file = document.getElementById('pricesFile').files[0];
+        if (!file) return;
+        try {
+            document.getElementById('pricesTextarea').value = await readFileAsText(file);
+            updateStats();
+            showNotification('Prices file loaded.', 'success');
+        } catch (e) { showNotification('Error reading file: ' + e.message, 'error'); }
+    }
+
+    async function handleMinOffersFileUpload() {
+        const file = document.getElementById('minOffersFile').files[0];
+        if (!file) return;
+        try {
+            document.getElementById('minOffersTextarea').value = await readFileAsText(file);
+            updateStats();
+            showNotification('Min offers file loaded.', 'success');
+        } catch (e) { showNotification('Error reading file: ' + e.message, 'error'); }
+    }
+
+    // ============ Stats & match status ============
+    function updateStats() {
+        jwts = parseLines(document.getElementById('jwtsTextarea').value);
+        listingIds = parseLines(document.getElementById('listingIdsTextarea').value);
+        prices = parseLines(document.getElementById('pricesTextarea').value);
+        minOffers = parseLines(document.getElementById('minOffersTextarea').value);
+
+        totalListings = listingIds.length;
+        processedListings = 0;
+        successfulUpdates = 0;
+        failedUpdates = 0;
+
+        document.getElementById('totalListings').textContent = totalListings;
+        document.getElementById('processedListings').textContent = processedListings;
+        document.getElementById('successfulUpdates').textContent = successfulUpdates;
+        document.getElementById('failedUpdates').textContent = failedUpdates;
+
+        document.getElementById('jwtsCount').textContent = `${jwts.length} JWTs`;
+        document.getElementById('listingIdsCount').textContent = `${listingIds.length} IDs`;
+        document.getElementById('pricesCount').textContent = `${prices.length} prices`;
+        document.getElementById('minOffersCount').textContent = `${minOffers.length} min offers`;
+
+        if (totalListings > 0) {
+            const warnings = [];
+
+            if (jwts.length === 0) {
+                warnings.push('⚠️ No JWT provided. Please enter at least one JWT.');
+            } else if (jwts.length < totalListings) {
+                warnings.push(`⚠️ Only ${jwts.length} JWT(s) for ${totalListings} listing(s). Last JWT will be repeated.`);
+            } else if (jwts.length > totalListings) {
+                warnings.push(`⚠️ ${jwts.length} JWTs but only ${totalListings} listing(s). Extra ignored.`);
+            }
+
+            if (prices.length === 0) {
+                warnings.push('⚠️ No prices provided. Please enter new prices.');
+            } else if (prices.length < totalListings) {
+                warnings.push(`⚠️ Only ${prices.length} price(s). Last "${prices[prices.length-1]}" will be repeated.`);
+            } else if (prices.length > totalListings) {
+                warnings.push(`⚠️ ${prices.length} prices but only ${totalListings} listing(s). Extra ignored.`);
+            }
+
+            if (minOffers.length === 0) {
+                warnings.push('⚠️ No min offers provided. Please enter min offers.');
+            } else if (minOffers.length < totalListings) {
+                warnings.push(`⚠️ Only ${minOffers.length} min offer(s). Last "${minOffers[minOffers.length-1]}" will be repeated.`);
+            } else if (minOffers.length > totalListings) {
+                warnings.push(`⚠️ ${minOffers.length} min offers but only ${totalListings} listing(s). Extra ignored.`);
+            }
+
+            if (warnings.length > 0) {
+                matchStatus.style.display = 'block';
+                matchStatus.className = 'match-status match-warning';
+                matchStatus.innerHTML = warnings.join('<br>');
+            } else {
+                matchStatus.style.display = 'block';
+                matchStatus.className = 'match-status match-success';
+                matchStatus.innerHTML = '✅ Perfect match! JWTs, prices, and min offers all align with listings.';
+            }
+        } else {
+            matchStatus.style.display = 'none';
+        }
+    }
+
+    // ============ Repeat-last-value getters ============
+    function getJwtForIndex(i) {
+        if (jwts.length === 0) return '';
+        return i < jwts.length ? jwts[i] : jwts[jwts.length - 1];
+    }
+    function getPriceForIndex(i) {
+        if (prices.length === 0) return '0';
+        return i < prices.length ? prices[i] : prices[prices.length - 1];
+    }
+    function getMinOfferForIndex(i) {
+        if (minOffers.length === 0) return '0.1';
+        return i < minOffers.length ? minOffers[i] : minOffers[minOffers.length - 1];
+    }
+
+    // ============ Main flow ============
+    async function startProcessing() {
+        if (isProcessing) { stopProcessing(); return; }
+
+        DELAY_BETWEEN_REQUESTS = getCurrentDelay();
+        updateStats();
+
+        if (jwts.length === 0) { showNotification('Please enter at least one JWT token', 'error'); return; }
+        if (totalListings === 0) { showNotification('No listing IDs found.', 'error'); return; }
+        if (prices.length === 0) { showNotification('Please enter at least one price', 'error'); return; }
+        if (minOffers.length === 0) { showNotification('Please enter at least one min offer', 'error'); return; }
+
+        isProcessing = true;
+        isPaused = false;
+        currentIndex = 0;
+        results = [];
+        processedListings = 0;
+        successfulUpdates = 0;
+        failedUpdates = 0;
+
+        startButton.textContent = 'Stop Processing';
+        startButton.classList.add('button-stop');
+        pauseButton.style.display = 'inline-block';
+        resumeButton.style.display = 'none';
+        progressContainer.style.display = 'block';
+        progressBar.style.width = '0%';
+
+        logContainer.innerHTML = '';
+        addLog('Starting to update market prices...', 'info');
+        addLog(`Listings: ${totalListings} | JWTs: ${jwts.length} | Prices: ${prices.length} | MinOffers: ${minOffers.length}`, 'info');
+        addLog(`Delay between requests: ${DELAY_BETWEEN_REQUESTS}ms`, 'info');
+
+        if (jwts.length < totalListings) addLog(`Note: Last JWT will be repeated for remaining listings.`, 'warning');
+        if (prices.length < totalListings) addLog(`Note: Last price "${prices[prices.length-1]}" will be repeated.`, 'warning');
+        if (minOffers.length < totalListings) addLog(`Note: Last min offer "${minOffers[minOffers.length-1]}" will be repeated.`, 'warning');
+
+        await processListings();
+    }
+
+    function stopProcessing() {
+        isProcessing = false;
+        startButton.textContent = 'Start Updating Prices';
+        startButton.classList.remove('button-stop');
+        pauseButton.style.display = 'none';
+        resumeButton.style.display = 'none';
+        addLog('Processing stopped by user', 'info');
+    }
+
+    function pauseProcessing() {
+        isPaused = true;
+        pauseButton.style.display = 'none';
+        resumeButton.style.display = 'inline-block';
+        addLog('Processing paused', 'info');
+    }
+
+    function resumeProcessing() {
+        isPaused = false;
+        resumeButton.style.display = 'none';
+        pauseButton.style.display = 'inline-block';
+        addLog('Processing resumed', 'info');
+    }
+
+    async function processListings() {
+        for (let i = currentIndex; i < totalListings && isProcessing; i++) {
+            while (isPaused && isProcessing) { await sleep(500); }
+            if (!isProcessing) break;
+
+            currentIndex = i;
+            const listingId = listingIds[i];
+            const price = getPriceForIndex(i);
+            const minOffer = getMinOfferForIndex(i);
+            const jwtToken = getJwtForIndex(i);
+            const jwtIndex = Math.min(i, jwts.length - 1);
+
+            addLog(`Updating listing ${i + 1}/${totalListings} (ID: ${listingId}) → price ${price}, minOffer ${minOffer} (JWT #${jwtIndex + 1})...`, 'info');
+
+            try {
+                const success = await updateMarketPrice(listingId, jwtToken, price, minOffer);
+
+                if (success) {
+                    successfulUpdates++;
+                    addLog(`✓ Listing ${listingId} updated: price ${price}, minOffer ${minOffer} (JWT #${jwtIndex + 1})`, 'success');
+                } else {
+                    failedUpdates++;
+                    addLog(`✗ Failed to update listing ${listingId}`, 'error');
+                }
+
+                processedListings++;
+                results.push({
+                    listingId,
+                    price,
+                    minOffer,
+                    jwtIndex,
+                    success,
+                    timestamp: new Date().toISOString()
+                });
+            } catch (error) {
+                failedUpdates++;
+                processedListings++;
+                addLog(`✗ Error updating listing ${listingId}: ${error.message}`, 'error');
+                results.push({
+                    listingId,
+                    price,
+                    minOffer,
+                    jwtIndex,
+                    success: false,
+                    error: error.message,
+                    timestamp: new Date().toISOString()
+                });
+            }
+
+            document.getElementById('processedListings').textContent = processedListings;
+            document.getElementById('successfulUpdates').textContent = successfulUpdates;
+            document.getElementById('failedUpdates').textContent = failedUpdates;
+
+            progressBar.style.width = `${((i + 1) / totalListings) * 100}%`;
+
+            if (i < totalListings - 1 && isProcessing) {
+                addLog(`Waiting ${DELAY_BETWEEN_REQUESTS/1000}s...`, 'info');
+                await sleep(DELAY_BETWEEN_REQUESTS);
+            }
+        }
+
+        if (isProcessing) {
+            isProcessing = false;
+            startButton.textContent = 'Start Updating Prices';
+            startButton.classList.remove('button-stop');
+            pauseButton.style.display = 'none';
+            resumeButton.style.display = 'none';
+
+            addLog(`Processing complete. Success: ${successfulUpdates}, Failed: ${failedUpdates}.`, 'info');
+            showNotification(`Update complete! ${successfulUpdates} successful, ${failedUpdates} failed.`, 'success');
+        }
+    }
+
+    // ============ PATCH single listing ============
+    async function updateMarketPrice(listingId, jwtToken, price, minOffer) {
+        const headers = {
+            'Content-Type': 'application/json',
+            'x-user-jwt': jwtToken
+        };
+
+        const body = {
+            price: price,
+            minOffer: minOffer
+        };
+
+        const response = await sendProxyRequest(MARKET_LISTED_ENDPOINT(listingId), 'PATCH', headers, body);
+
+        // Support multiple response shapes
+        if (response && response.success === true) return true;
+        if (response && response.data && response.data.success === true) return true;
+        if (response && response.data && response.data.data && response.data.data.success === true) return true;
+
+        const errorMsg =
+            response?.error ||
+            response?.details?.message ||
+            response?.data?.error ||
+            'Failed to update price';
+        throw new Error(errorMsg);
+    }
+
+    // ============ UI helpers ============
+    function addLog(message, type = 'info') {
+        const entry = document.createElement('div');
+        entry.className = `log-entry log-${type}`;
+        entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        logContainer.appendChild(entry);
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    function showNotification(message, type = 'info') {
+        notification.textContent = message;
+        notification.className = `notification notification-${type}`;
+        notification.style.display = 'block';
+        setTimeout(() => { notification.style.display = 'none'; }, 5000);
+    }
+
+    function downloadResults() {
+        if (results.length === 0) {
+            showNotification('No results to download', 'error');
+            return;
+        }
+
+        let text = 'Bundle Market Multi-Price Update Results\n';
+        text += '=========================================\n\n';
+        text += `Total Listings: ${totalListings}\n`;
+        text += `JWTs used: ${jwts.length}\n`;
+        text += `Successfully Updated: ${successfulUpdates}\n`;
+        text += `Failed: ${failedUpdates}\n`;
+        text += `Processed: ${processedListings}\n\n`;
+        text += 'Detailed Results:\n';
+        text += '-----------------\n';
+
+        results.forEach((r, i) => {
+            text += `${i + 1}. Listing ID: ${r.listingId}\n`;
+            text += `   New Price: ${r.price}\n`;
+            text += `   Min Offer: ${r.minOffer}\n`;
+            text += `   JWT #: ${(r.jwtIndex ?? 0) + 1}\n`;
+            text += `   Status: ${r.success ? 'SUCCESS' : 'FAILED'}\n`;
+            text += `   Timestamp: ${r.timestamp}\n`;
+            if (r.error) text += `   Error: ${r.error}\n`;
+            text += '\n';
+        });
+
+        const now = new Date();
+        const stamp = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}h${String(now.getMinutes()).padStart(2,'0')}`;
+
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `multi_price_update_${stamp}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showNotification('Results downloaded successfully!', 'success');
+    }
+</script>
+</body>
+</html>

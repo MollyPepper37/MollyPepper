@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Market Offers Scanner</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        h1 { color: #2c3e50; margin-bottom: 20px; }
+        .config-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        textarea { height: 130px; font-family: monospace; font-size: 13px; resize: vertical; }
+        .row { display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; }
+        .row .field { flex: 1; min-width: 180px; }
+        .row .field input { margin-bottom: 0; }
+        .textarea-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .count-badge {
+            background-color: #3498db;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: normal;
+        }
+        .button-group { display: flex; gap: 10px; margin: 20px 0; flex-wrap: wrap; }
+        button {
+            padding: 11px 22px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            font-size: 14px;
+        }
+        button:hover:not(:disabled) { background-color: #2980b9; }
+        button:disabled { background-color: #95a5a6; cursor: not-allowed; opacity: 0.7; }
+        .btn-scan { background-color: #3498db; }
+        .btn-stop { background-color: #e74c3c; }
+        .btn-stop:hover:not(:disabled) { background-color: #c0392b; }
+        .btn-csv { background-color: #27ae60; }
+        .btn-csv:hover:not(:disabled) { background-color: #1e8449; }
+        .btn-copy { background-color: #8b5cf6; }
+        .btn-copy:hover:not(:disabled) { background-color: #7c3aed; }
+        .btn-clear { background-color: #95a5a6; }
+        .btn-clear:hover:not(:disabled) { background-color: #7f8c8d; }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .stat-item { text-align: center; flex: 1; min-width: 120px; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #3498db; }
+        .stat-label { font-size: 13px; color: #7f8c8d; }
+
+        .progress-container {
+            width: 100%;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+            display: none;
+        }
+        .progress-bar {
+            height: 8px;
+            background-color: #2ecc71;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: 600px;
+            display: none;
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        thead th {
+            background: #f8fafc;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+            color: #1e293b;
+            border-bottom: 2px solid #e2e8f0;
+            white-space: nowrap;
+        }
+        tbody td {
+            padding: 10px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+        tbody tr:hover td { background: #fafcff; }
+        .mono { font-family: 'JetBrains Mono', Consolas, monospace; font-size: 12px; }
+        .price { font-weight: 600; color: #16a34a; }
+        .mint-badge {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .log-container {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-family: monospace;
+            font-size: 13px;
+        }
+        .log-entry { padding: 5px 0; border-bottom: 1px solid #f1f5f9; }
+        .log-success { color: #27ae60; }
+        .log-error { color: #e74c3c; }
+        .log-info { color: #3498db; }
+        .log-warning { color: #f39c12; }
+
+        .notification {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
+            font-weight: 500;
+        }
+        .notification-success { background: #d5f4e6; color: #27ae60; border: 1px solid #a3e4c3; }
+        .notification-error { background: #fadbd8; color: #e74c3c; border: 1px solid #f5b7b1; }
+        .notification-info { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+        .small-note { font-size: 12px; color: #7f8c8d; margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+    <h1>🔎 Market Offers Scanner</h1>
+
+    <div class="config-section">
+        <div class="row">
+            <div class="field" style="flex: 2;">
+                <label for="jwtInput">JWT Tokens (one per line):</label>
+                <textarea id="jwtInput" placeholder="Paste one or more JWT tokens here, one per line"></textarea>
+                <div class="small-note">Each JWT will be scanned separately; results are combined.</div>
+            </div>
+            <div class="field" style="max-width: 200px;">
+                <label for="delayInput">Delay between accounts (ms):</label>
+                <input type="number" id="delayInput" value="2000" min="0" step="100" />
+            </div>
+            <div class="field" style="max-width: 200px;">
+                <label for="maxPagesInput">Max pages per account:</label>
+                <input type="number" id="maxPagesInput" value="100" min="1" step="1" />
+                <div class="small-note">Safety cap (50 offers/page).</div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button id="scanBtn" class="btn-scan">▶ Scan Offers</button>
+            <button id="stopBtn" class="btn-stop" style="display: none;">⏹ Stop</button>
+            <button id="downloadBtn" class="btn-csv" disabled>⬇ Download CSV</button>
+            <button id="copyIdsBtn" class="btn-copy" disabled>📋 Copy Offer IDs</button>
+            <button id="clearBtn" class="btn-clear">🗑 Clear</button>
+        </div>
+
+        <div id="notification" class="notification"></div>
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-item">
+            <div class="stat-value" id="statAccounts">0</div>
+            <div class="stat-label">Accounts Scanned</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="statOffers">0</div>
+            <div class="stat-label">Total Offers</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="statPages">0</div>
+            <div class="stat-label">Pages Fetched</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="statErrors">0</div>
+            <div class="stat-label">Errors</div>
+        </div>
+    </div>
+
+    <div class="table-container" id="tableContainer">
+        <table id="resultsTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Offer ID</th>
+                    <th>From User</th>
+                    <th>From User ID</th>
+                    <th>Market ID</th>
+                    <th>Counter Price</th>
+                    <th>Market Price</th>
+                    <th>Mint</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <div class="log-container" id="logContainer">
+        <div class="log-entry log-info">Ready. Paste JWT(s) and click "Scan Offers".</div>
+    </div>
+
+<script src="/nav-loader.js"></script>
+<script>
+    // ============ Config ============
+    const PROXY_URL = '/proxy';
+    const PAGE_SIZE = 50; // API returns 50 per page
+
+    // ============ State ============
+    let isScanning = false;
+    let stopFlag = false;
+    let allOffers = [];      // flat array of normalized offer objects
+    let pagesFetched = 0;
+    let accountsScanned = 0;
+    let errorsCount = 0;
+
+    // ============ DOM ============
+    const $ = id => document.getElementById(id);
+    const jwtInput = $('jwtInput');
+    const delayInput = $('delayInput');
+    const maxPagesInput = $('maxPagesInput');
+    const scanBtn = $('scanBtn');
+    const stopBtn = $('stopBtn');
+    const downloadBtn = $('downloadBtn');
+    const copyIdsBtn = $('copyIdsBtn');
+    const clearBtn = $('clearBtn');
+    const notification = $('notification');
+    const progressContainer = $('progressContainer');
+    const progressBar = $('progressBar');
+    const tableContainer = $('tableContainer');
+    const tableBody = $('tableBody');
+    const logContainer = $('logContainer');
+
+    // ============ Helpers ============
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+    function getDelay() {
+        const v = parseInt(delayInput.value, 10);
+        return isNaN(v) || v < 0 ? 2000 : v;
+    }
+    function getMaxPages() {
+        const v = parseInt(maxPagesInput.value, 10);
+        return isNaN(v) || v < 1 ? 100 : v;
+    }
+    function addLog(msg, type = 'info') {
+        const entry = document.createElement('div');
+        entry.className = `log-entry log-${type}`;
+        entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        logContainer.appendChild(entry);
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+    function showNotification(msg, type = 'info') {
+        notification.textContent = msg;
+        notification.className = `notification notification-${type}`;
+        notification.style.display = 'block';
+        setTimeout(() => { notification.style.display = 'none'; }, 5000);
+    }
+    function updateStats() {
+        $('statAccounts').textContent = accountsScanned;
+        $('statOffers').textContent = allOffers.length;
+        $('statPages').textContent = pagesFetched;
+        $('statErrors').textContent = errorsCount;
+    }
+
+    // ============ Proxy ============
+    async function sendProxyRequest(endpoint, method = 'GET', headers = {}, data = null) {
+        const res = await fetch(PROXY_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ endpoint, method, headers, data })
+        });
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`HTTP ${res.status}: ${errorText}`);
+        }
+        return await res.json();
+    }
+
+    // ============ Fetch one page ============
+    async function fetchPage(jwt, page) {
+        const endpoint = `/market/counter-offers?self=false&page=${page}`;
+        const headers = {
+            'Content-Type': 'application/json',
+            'x-user-jwt': jwt
+        };
+        const response = await sendProxyRequest(endpoint, 'GET', headers, null);
+
+        // Support possible nesting: { success, data: [...] } or { data: { data: [...] } }
+        let arr = null;
+        if (Array.isArray(response?.data)) arr = response.data;
+        else if (Array.isArray(response?.data?.data)) arr = response.data.data;
+        else if (Array.isArray(response)) arr = response;
+
+        if (!Array.isArray(arr)) {
+            throw new Error('Unexpected response shape (no data array)');
+        }
+        return arr;
+    }
+
+    // ============ Fetch all pages for one JWT ============
+    async function fetchAllOffersForJwt(jwt, label) {
+        const maxPages = getMaxPages();
+        let page = 1;
+        let collected = [];
+
+        while (page <= maxPages) {
+            if (stopFlag) break;
+
+            let batch;
+            try {
+                batch = await fetchPage(jwt, page);
+            } catch (err) {
+                addLog(`  ✗ ${label} page ${page} failed: ${err.message}`, 'error');
+                errorsCount++;
+                updateStats();
+                break;
+            }
+
+            pagesFetched++;
+            updateStats();
+
+            if (batch.length === 0) {
+                addLog(`  ✓ ${label}: page ${page} empty — no more pages`, 'info');
+                break;
+            }
+
+            // Normalize each offer to a flat row
+            for (const offer of batch) {
+                collected.push(normalizeOffer(offer));
+            }
+
+            addLog(`  ↻ ${label}: page ${page} → ${batch.length} offers (total so far: ${collected.length})`, 'info');
+
+            // Stop condition: fewer than PAGE_SIZE means last page
+            if (batch.length < PAGE_SIZE) {
+                break;
+            }
+
+            page++;
+        }
+
+        return collected;
+    }
+
+    // ============ Normalize one offer ============
+    function normalizeOffer(o) {
+        const card = o?.market?.card || {};
+        return {
+            id: o?.id ?? '',
+            fromUsername: o?.fromUser?.username ?? '',
+            fromUserId: o?.fromUser?.id ?? o?.fromUserId ?? '',
+            marketId: o?.marketId ?? o?.market?.id ?? '',
+            counterPrice: o?.counterPrice ?? '',
+            mintBatch: card?.mintBatch ?? '',
+            mintNumber: card?.mintNumber ?? '',
+            marketPrice: o?.market?.price ?? ''
+        };
+    }
+
+    // ============ Render table ============
+    function renderTable() {
+        if (allOffers.length === 0) {
+            tableContainer.style.display = 'none';
+            downloadBtn.disabled = true;
+            copyIdsBtn.disabled = true;
+            return;
+        }
+
+        const rows = allOffers.map((o, idx) => {
+            const tr = document.createElement('tr');
+
+            const tdIdx = document.createElement('td');
+            tdIdx.textContent = idx + 1;
+
+            const tdId = document.createElement('td');
+            tdId.className = 'mono';
+            tdId.textContent = o.id;
+
+            const tdUser = document.createElement('td');
+            tdUser.textContent = o.fromUsername;
+
+            const tdUserId = document.createElement('td');
+            tdUserId.className = 'mono';
+            tdUserId.textContent = o.fromUserId;
+
+            const tdMarket = document.createElement('td');
+            tdMarket.className = 'mono';
+            tdMarket.textContent = o.marketId;
+
+            const tdCounter = document.createElement('td');
+            tdCounter.className = 'price';
+            tdCounter.textContent = o.counterPrice;
+
+            const tdMarketPrice = document.createElement('td');
+            tdMarketPrice.className = 'price';
+            tdMarketPrice.textContent = o.marketPrice;
+
+            const tdMint = document.createElement('td');
+            const mintText = `${o.mintBatch || '—'} #${o.mintNumber ?? '—'}`;
+            tdMint.innerHTML = `<span class="mint-badge">${mintText}</span>`;
+
+            tr.appendChild(tdIdx);
+            tr.appendChild(tdId);
+            tr.appendChild(tdUser);
+            tr.appendChild(tdUserId);
+            tr.appendChild(tdMarket);
+            tr.appendChild(tdCounter);
+            tr.appendChild(tdMarketPrice);
+            tr.appendChild(tdMint);
+
+            return tr;
+        });
+
+        tableBody.innerHTML = '';
+        rows.forEach(r => tableBody.appendChild(r));
+
+        tableContainer.style.display = 'block';
+        downloadBtn.disabled = false;
+        copyIdsBtn.disabled = false;
+    }
+
+    // ============ Main scan ============
+    async function scanAll() {
+        if (isScanning) return;
+
+        const raw = jwtInput.value.trim();
+        if (!raw) {
+            showNotification('Please enter at least one JWT token', 'error');
+            return;
+        }
+
+        const jwts = raw.split('\n').map(s => s.trim()).filter(Boolean);
+        if (jwts.length === 0) {
+            showNotification('No valid JWTs found', 'error');
+            return;
+        }
+
+        // Reset
+        isScanning = true;
+        stopFlag = false;
+        allOffers = [];
+        pagesFetched = 0;
+        accountsScanned = 0;
+        errorsCount = 0;
+        tableBody.innerHTML = '';
+        tableContainer.style.display = 'none';
+        downloadBtn.disabled = true;
+        copyIdsBtn.disabled = true;
+        updateStats();
+
+        scanBtn.disabled = true;
+        stopBtn.style.display = 'inline-block';
+        progressContainer.style.display = 'block';
+        progressBar.style.width = '0%';
+
+        addLog(`Starting scan for ${jwts.length} account(s) — delay ${getDelay()}ms, max ${getMaxPages()} page(s) each`, 'info');
+
+        const delay = getDelay();
+
+        for (let i = 0; i < jwts.length && !stopFlag; i++) {
+            const jwt = jwts[i];
+            const label = `Account ${i + 1}/${jwts.length}`;
+            const shortJwt = jwt.length > 30 ? jwt.substring(0, 27) + '...' : jwt;
+            addLog(`▶ ${label} (${shortJwt})`, 'info');
+
+            try {
+                const offers = await fetchAllOffersForJwt(jwt, label);
+                allOffers.push(...offers);
+                accountsScanned++;
+                addLog(`✓ ${label}: collected ${offers.length} offers`, 'success');
+            } catch (err) {
+                errorsCount++;
+                addLog(`✗ ${label} failed: ${err.message}`, 'error');
+            }
+
+            updateStats();
+            progressBar.style.width = `${((i + 1) / jwts.length) * 100}%`;
+
+            if (i < jwts.length - 1 && !stopFlag) {
+                await sleep(delay);
+            }
+        }
+
+        isScanning = false;
+        scanBtn.disabled = false;
+        stopBtn.style.display = 'none';
+        progressContainer.style.display = 'none';
+        updateStats();
+
+        if (stopFlag) {
+            addLog('Scanning stopped by user', 'warning');
+            showNotification('Stopped', 'info');
+        } else {
+            addLog(`Done. ${allOffers.length} offers collected across ${accountsScanned} account(s)`, 'success');
+            showNotification(`Done! ${allOffers.length} offers found`, 'success');
+        }
+
+        renderTable();
+    }
+
+    function stopScan() {
+        stopFlag = true;
+        addLog('Stopping...', 'warning');
+    }
+
+    // ============ CSV download ============
+    function downloadCSV() {
+        if (allOffers.length === 0) {
+            showNotification('No data to download', 'error');
+            return;
+        }
+
+        const headers = [
+            'id',
+            'fromUser.username',
+            'fromUser.id',
+            'marketId',
+            'counterPrice',
+            'market.card.mintBatch',
+            'market.card.mintNumber',
+            'market.price'
+        ];
+
+        const escape = (v) => {
+            const s = String(v ?? '');
+            if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+                return '"' + s.replace(/"/g, '""') + '"';
+            }
+            return s;
+        };
+
+        let csv = headers.join(',') + '\n';
+        for (const o of allOffers) {
+            csv += [
+                o.id,
+                o.fromUsername,
+                o.fromUserId,
+                o.marketId,
+                o.counterPrice,
+                o.mintBatch,
+                o.mintNumber,
+                o.marketPrice
+            ].map(escape).join(',') + '\n';
+        }
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const now = new Date();
+        const stamp = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}h${String(now.getMinutes()).padStart(2, '0')}`;
+        a.download = `market_offers_${stamp}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showNotification('CSV downloaded', 'success');
+        addLog('CSV downloaded', 'info');
+    }
+
+    // ============ Copy offer IDs ============
+    async function copyOfferIds() {
+        if (allOffers.length === 0) {
+            showNotification('No offer IDs to copy', 'error');
+            return;
+        }
+
+        const text = allOffers.map(o => o.id).join('\n');
+        try {
+            await navigator.clipboard.writeText(text);
+            showNotification(`Copied ${allOffers.length} offer IDs`, 'success');
+            addLog(`Copied ${allOffers.length} offer IDs to clipboard`, 'success');
+        } catch (err) {
+            // Fallback for older browsers / non-secure contexts
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showNotification(`Copied ${allOffers.length} offer IDs`, 'success');
+            addLog(`Copied ${allOffers.length} offer IDs to clipboard (fallback)`, 'success');
+        }
+    }
+
+    // ============ Clear ============
+    function clearAll() {
+        if (isScanning) {
+            showNotification('Cannot clear while scanning', 'error');
+            return;
+        }
+        allOffers = [];
+        pagesFetched = 0;
+        accountsScanned = 0;
+        errorsCount = 0;
+        tableBody.innerHTML = '';
+        tableContainer.style.display = 'none';
+        downloadBtn.disabled = true;
+        copyIdsBtn.disabled = true;
+        logContainer.innerHTML = '';
+        addLog('Cleared', 'info');
+        updateStats();
+    }
+
+    // ============ Events ============
+    scanBtn.addEventListener('click', scanAll);
+    stopBtn.addEventListener('click', stopScan);
+    downloadBtn.addEventListener('click', downloadCSV);
+    copyIdsBtn.addEventListener('click', copyOfferIds);
+    clearBtn.addEventListener('click', clearAll);
+</script>
+</body>
+</html>

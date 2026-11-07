@@ -1,7 +1,7 @@
 [
   {
     "userId": "365093",
-    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiS05wUVgvUDNGeWI5WENIZzM2cWYwQT09OmVOUEJYVFJKNFgzb0pwQXVIR3c2eU1jY2F4b0tiZkZFR29KS2pRaExpdW14bGUzeTYwTFlGeVZ0c3NjV2Q0cm0yOWFFck9ZLy92a2t3Wldwd2Zscy95WCtqYzE1ZmtlbFMxODhpVU9NUGkzS0YxRzVSL0ZsU2FEeEhjMm5MWnMr",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiS05wUVgvUDNGeWI5WENIZzM2cWYwQT09OmVOUEJYVFJKNFgzb0pwQXVIR3c2eU1jY2F4b0tiZkZFR29KS2pRaExpdW14bGUzeTYwTFlGeVZ0c3NjV2Q0cm0yOWFFck9ZLy92a2t3Wldwd2Zscy95WCtqYzE1ZmtlbFMxODhpVU9NUGkzS0YxRzVSL0ZsU2FEeEhjMm5MWnMrOFdwSVFkZXVpOEY1NkVPVUpNUzZDSVUvOVlQcDRzWmI3K0xZeDJ0dXEvS2NpUEhXQytjbFUwSFBVeUFJRklDWmJtbmdmTEFtQXgva0M2TmVhSGg0bHBFUFU2UEl5STVITVBMZVR1R2xzaFk9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzU1MDc2MjA5LCJpc3MiOiJlcGljcy5nZyJ9.09mfVQWv-fMBI0foAD_W07eIAK2oww97Zj2Ljm_qvWEdh3acm6iEnYgFNQenDBmf",
     "userNick": "johnothet",
     "dayStart": "6:15",
     "dayEnd": "22:49",
@@ -9,11 +9,12 @@
     "randomScale1": "3",
     "randomScale2": "10",
     "lister-jitter": "255",
-    "aggression": "-0.5"
+    "aggression": "-0.5",
+    "": "10"
   },
   {
     "userId": "453028",
-    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoid09hWnc1YjVIUHRnV0ZpMW1rZlJrUT09Ojd1b1RmY1ZHNDZoaWdKYkxjd1NQVDhiL3BraXY1TGtIZVU3cWtWd0toSGZEYWNSQzRON2JJUDAxTG1GdHE2K1NIVVJyVWVHblRrWHZnV3RqTmcxUlhXaDl5N0M3TDNwSXBZNlRWc1hzWkNtTjhaMzV1Mks0b09oS1Y4SXAvODBN",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoid09hWnc1YjVIUHRnV0ZpMW1rZlJrUT09Ojd1b1RmY1ZHNDZoaWdKYkxjd1NQVDhiL3BraXY1TGtIZVU3cWtWd0toSGZEYWNSQzRON2JJUDAxTG1GdHE2K1NIVVJyVWVHblRrWHZnV3RqTmcxUlhXaDl5N0M3TDNwSXBZNlRWc1hzWkNtTjhaMzV1Mks0b09oS1Y4SXAvODBNbk5iN2dzSnVxLys3R1RhYktJZi9jRTdhSHhudHZyb0g5K3Vza0F1N3lRN1JVNHRsMi84NWVHTk8vbHMyazJBNWdzOXQxR2Q2RjVPZmRsNCtCeHl3Ync9PSIsInZlcnNpb24iOjEsImlhdCI6MTc1MDg0MDUzOSwiaXNzIjoiZXBpY3MuZ2cifQ.TaRtLoh7u64aIRpKlXt11XKrceXszHGpx8IRkQ_U4SwwTCxD0nRPC7dVZAHlzgKn",
     "userNick": "mishkakunishka",
     "dayStart": "6:42",
     "dayEnd": "22:40",
@@ -21,11 +22,12 @@
     "randomScale1": "3",
     "randomScale2": "10",
     "lister-jitter": "345",
-    "aggression": "0.2"
+    "aggression": "0.2",
+    "": "10"
   },
   {
     "userId": "371029",
-    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoicTI3UzlseStwaHl0MklnNGJUZVVpZz09OmFIS3FTcjdCUkQreEdMVmZEeGF3UlU1TzAxcmtveENwZzVrdk9WQzlodmxGNmk3eFJRUDFkSHcraXdTcmNxR1pSakdUZGtXY3Y4Z2tyTDEyK2gvQXREMVpmcXVmRm9BNHFMemNYeFRLUkMzSUd3NnZiTHF3dWZtUDJ6VTRxVE44",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoicTI3UzlseStwaHl0MklnNGJUZVVpZz09OmFIS3FTcjdCUkQreEdMVmZEeGF3UlU1TzAxcmtveENwZzVrdk9WQzlodmxGNmk3eFJRUDFkSHcraXdTcmNxR1pSakdUZGtXY3Y4Z2tyTDEyK2gvQXREMVpmcXVmRm9BNHFMemNYeFRLUkMzSUd3NnZiTHF3dWZtUDJ6VTRxVE44NkhubXMyODNqQWVpN0NSZ0l2Q2RkSFhpM3ozTXkxcndkNFhvdlRRamJRV1VhL1NwNFErbWFGV2hZdUI1V2lEOFZVSlUrR2tkdUM5Z1JETHo2eWY2NVE9PSIsInZlcnNpb24iOjEsImlhdCI6MTc1MDg0MDUxOSwiaXNzIjoiZXBpY3MuZ2cifQ.blye3L0cQanNSXpHpc9OhT67JSti-sP21vPLpUFtoEs_Z9a8vmh4JoLo4e6pyK3p",
     "userNick": "skimma6",
     "dayStart": "6:35",
     "dayEnd": "22:48",
@@ -33,11 +35,12 @@
     "randomScale1": "1",
     "randomScale2": "8",
     "lister-jitter": "165",
-    "aggression": "0.7"
+    "aggression": "0.7",
+    "": "8"
   },
   {
     "userId": "149799",
-    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiSTYzTWx4dit1M2VHSENkT1B6L0x5QT09OkdZcVhLNVV1NUJnczR6b1RySys3am5mWlFyeG91Uysydm1jTE9DN0pzVDNBR0FxV3VDQ09pSU9XSnpYVXE2ZFhkY0R5L1pyNVJJVnJRK2NaeGc1LzBLd2Rrb0hmczN2VVpTQkFEcTIwL1FkLzV5QjJhRUFHQnpxYk5WVk5kVGM5",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiSTYzTWx4dit1M2VHSENkT1B6L0x5QT09OkdZcVhLNVV1NUJnczR6b1RySys3am5mWlFyeG91Uysydm1jTE9DN0pzVDNBR0FxV3VDQ09pSU9XSnpYVXE2ZFhkY0R5L1pyNVJJVnJRK2NaeGc1LzBLd2Rrb0hmczN2VVpTQkFEcTIwL1FkLzV5QjJhRUFHQnpxYk5WVk5kVGM5MElEZnlEUDRCczVnTlZDbVpIakNJSDFsNVFhR2EyM2U4Q2FQNG9UKy9TYXMzNGRHMDJEQmd5bUxIVVRYNHluLzBlWWtUS0plV2xnVWpuU244b3dtTnc9PSIsInZlcnNpb24iOjEsImlhdCI6MTc3NjM0MDMxNSwiaXNzIjoiZXBpY3MuZ2cifQ.MIPoYy_y7HBH_RVrsiKrsfFxH_j1paewgs2qbVNMBW5dvUxq_1_f24RHQGt8erxX",
     "userNick": "xxws",
     "dayStart": "5:46",
     "dayEnd": "22:06",
@@ -45,11 +48,12 @@
     "randomScale1": "3",
     "randomScale2": "14",
     "lister-jitter": "225",
-    "aggression": "0.9"
+    "aggression": "0.9",
+    "": "14"
   },
   {
     "userId": "528611",
-    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiTTQwSjlJcmRqUlZTb25aVk9KM0NyQT09OlhnaEQyYzN0cXRzdVJwT0NXeVgxUzV2aGJTUEovME1JempBZVNUZjhTaEJodzBwZzI3QVl0a3A2ajR3amRtQzF3OXVYM3VvaGRidlVUS3JVY3JscHhNTzROWVhVTXhNcDZ2K29VL2IrZkxuR2tGaXptVnhncDMyODQrZVFtUnlZ",
+    "refreshToken": "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiTTQwSjlJcmRqUlZTb25aVk9KM0NyQT09OlhnaEQyYzN0cXRzdVJwT0NXeVgxUzV2aGJTUEovME1JempBZVNUZjhTaEJodzBwZzI3QVl0a3A2ajR3amRtQzF3OXVYM3VvaGRidlVUS3JVY3JscHhNTzROWVhVTXhNcDZ2K29VL2IrZkxuR2tGaXptVnhncDMyODQrZVFtUnlZYjJoZW9yNHBmYS94TWVwYjFZK1dzRHBVUlc3eC9ITkF3UzNMVlU5cjdkOTREeExFRjlUbXhtNDhSOWllUjhYVnYzdHNDdjNEYWpmS01KWTVKVXlCNFRLbk9STWQyWkJhVWFPTTNCMXZpMEU9IiwidmVyc2lvbiI6MSwiaWF0IjoxNzc2MjYwNTcyLCJpc3MiOiJlcGljcy5nZyJ9.xlQR9tfhdPfU8kLCfuCJI0OkSFAhv4uItGgJJnsMp8gsgAy8QslelGZqRmaGoxga",
     "userNick": "inzaneamaru",
     "dayStart": "5:37",
     "dayEnd": "22:43",
@@ -57,6 +61,7 @@
     "randomScale1": "3",
     "randomScale2": "13",
     "lister-jitter": "85",
-    "aggression": "-0.7"
+    "aggression": "-0.7",
+    "": "13"
   }
 ]

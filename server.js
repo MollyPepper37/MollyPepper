@@ -32,7 +32,7 @@ function debugLog(userId, action, url, method, headers = {}, data = null, respon
 }
 
 // ============================================================
-// ⚙️ CONFIG — env vars used by project 1's automation only
+// ⚙️ CONFIG — env vars
 // ============================================================
 const BASE_URL_REF       = process.env.BASE_URL_REF;
 const BASE_URL_MONEY     = process.env.BASE_URL_MONEY;
@@ -41,13 +41,6 @@ const BASE_URL_ACH       = process.env.BASE_URL_ACH;
 const BASE_URL_OPENPACK  = process.env.BASE_URL_OPENPACK;
 const USERS_CONFIG       = 'users.json';
 
-// ---------- ✅ FIX: Derive kolex API base for collections / market ----------
-// Priority:
-//   1. explicit BASE_URL_COLLECTIONS / BASE_URL_MARKET env vars
-//   2. strip known suffix from BASE_URL_SPRAY  (…/spinner/spin → …/api/v1)
-//   3. strip known suffix from BASE_URL_REF    (…/auth/refresh  → …/api/v1)
-//   4. strip known suffix from BASE_URL_MONEY  (…/user/funds    → …/api/v1)
-//   5. empty → log a loud warning at startup
 function deriveApiBase() {
     if (process.env.BASE_URL_COLLECTIONS) return process.env.BASE_URL_COLLECTIONS.replace(/\/+$/, '');
     if (process.env.BASE_URL_MARKET)      return process.env.BASE_URL_MARKET.replace(/\/+$/, '');
@@ -62,19 +55,13 @@ function deriveApiBase() {
         return null;
     };
 
-    const fromSpray = tryStrip(BASE_URL_SPRAY, [
-        /\/spinner\/spin$/, /\/spinner$/, /\/spin$/,
-    ]);
+    const fromSpray = tryStrip(BASE_URL_SPRAY, [/\/spinner\/spin$/, /\/spinner$/, /\/spin$/]);
     if (fromSpray) return fromSpray;
 
-    const fromRef = tryStrip(BASE_URL_REF, [
-        /\/auth\/refresh$/, /\/refresh$/, /\/auth$/,
-    ]);
+    const fromRef = tryStrip(BASE_URL_REF, [/\/auth\/refresh$/, /\/refresh$/, /\/auth$/]);
     if (fromRef) return fromRef;
 
-    const fromMoney = tryStrip(BASE_URL_MONEY, [
-        /\/user\/funds$/, /\/funds$/,
-    ]);
+    const fromMoney = tryStrip(BASE_URL_MONEY, [/\/user\/funds$/, /\/funds$/]);
     if (fromMoney) return fromMoney;
 
     return '';
@@ -84,7 +71,6 @@ const KOLEX_API_BASE = deriveApiBase();
 const BASE_URL_COLLECTIONS = process.env.BASE_URL_COLLECTIONS || KOLEX_API_BASE;
 const BASE_URL_MARKET      = process.env.BASE_URL_MARKET      || KOLEX_API_BASE;
 
-// Spinner endpoint — derive from SPRAY (…/spinner/spin → …/spinner), or override via env
 let BASE_URL_SPINNER = process.env.BASE_URL_SPINNER;
 if (!BASE_URL_SPINNER && BASE_URL_SPRAY) {
     BASE_URL_SPINNER = BASE_URL_SPRAY.split('?')[0].replace(/\/spin\/?$/, '');
@@ -102,6 +88,8 @@ let globalSpinnerConfig = {
     lastAutoFetch: null,
 };
 let globalListingConfig = { delayMs: 2400 };
+// NEW: global bundle config (dynamic target user ID)
+let globalBundleConfig = { targetUserId: 1047374 };
 let templateCirculationCache = {};
 let collectionCirculationProfiles = {};
 
@@ -118,7 +106,7 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 // ============================================================
-// 💵 PRICE FORMULA (tiered)
+// 💵 PRICE FORMULA
 // ============================================================
 function mintDesirability(M, circulation) {
     const m = Math.max(1, Math.floor(M));
@@ -311,7 +299,6 @@ async function initializeApp() {
         console.log(`   BASE_URL_MARKET      = ${BASE_URL_MARKET || '(EMPTY! ⚠️)'}`);
         if (!BASE_URL_COLLECTIONS || !BASE_URL_MARKET) {
             console.warn('⚠️  Scanner will fail — set BASE_URL_COLLECTIONS and BASE_URL_MARKET env vars');
-            console.warn('   (or ensure BASE_URL_SPRAY ends with /spinner/spin so it can be derived)');
         }
 
         await loadUserConfig();
@@ -331,6 +318,15 @@ async function initializeApp() {
             const p = JSON.parse(await fs.readFile('listing-config.json', 'utf8'));
             globalListingConfig.delayMs = p.delayMs || 2400;
         } catch { await fs.writeFile('listing-config.json', JSON.stringify(globalListingConfig, null, 2)); }
+
+        // NEW: load bundle config
+        try {
+            const p = JSON.parse(await fs.readFile('bundle-config.json', 'utf8'));
+            if (p.targetUserId && Number.isFinite(Number(p.targetUserId))) {
+                globalBundleConfig.targetUserId = Number(p.targetUserId);
+            }
+        } catch { await saveBundleConfig(); }
+        console.log(`🎯 Bundle target user = ${globalBundleConfig.targetUserId}`);
 
         for (const userId of Object.keys(userData)) await refreshToken(userId);
         startImmediateOperations();
@@ -363,10 +359,20 @@ async function loadUserConfig() {
                 logs: [], isActive: false, dailyAchievementsDone: false, dailyFundsChecks: 0, packsOpened: 0,
                 aggression: u.aggression != null ? Number(u.aggression) : 0,
                 listerJitter: u.listerJitter ?? u['lister-jitter'] ?? 150,
+                // NEW: bundle event state
+                nextBundleEventTime: null,
+                bundleEventsDone: 0,
+                bundlesPurchased: 0,
+                _bundleEventRunning: false,
             };
         }
         console.log(`✅ Loaded ${users.length} users`);
     } catch (e) { console.error('❌ User config:', e); userData = {}; }
+}
+
+async function saveBundleConfig() {
+    try { await fs.writeFile('bundle-config.json', JSON.stringify(globalBundleConfig, null, 2)); }
+    catch (e) { console.error('save bundle config:', e); }
 }
 
 // ============================================================
@@ -378,7 +384,7 @@ async function makeAPIRequest(url, method = 'GET', headers = {}, data = null, us
         const response = await axios({
             method: method.toLowerCase(), url,
             headers: { 'Content-Type': 'application/json', ...headers },
-            data, timeout: 20000,
+            data, timeout: 30000,
         });
         debugLog(userId, 'RES', url, method, headers, data, response);
         return { success: true, data: response.data, status: response.status };
@@ -517,7 +523,11 @@ async function openPack(userId, packId) {
     const user = userData[userId];
     if (!user?.jwtToken) return false;
     const r = await makeAPIRequest(BASE_URL_OPENPACK, 'POST', { 'x-user-jwt': user.jwtToken }, { packId }, userId);
-    if (r.success) { user.packsOpened = (user.packsOpened || 0) + 1; logActivity(userId, `✅ Pack opened: ${packId}`); return true; }
+    if (r.success) {
+        user.packsOpened = (user.packsOpened || 0) + 1;
+        logActivity(userId, `✅ Pack opened: ${packId} (total: ${user.packsOpened})`);
+        return true;
+    }
     if (r.status === 401 && await refreshToken(userId)) return openPack(userId, packId);
     return false;
 }
@@ -591,13 +601,13 @@ function toISOStringOrNull(v) { if (!v) return null; try { const d = new Date(v)
 function safeUsersSnapshot() {
     const out = {};
     for (const [id, u] of Object.entries(userData)) {
-        const { _achTimers, _dailyRolloverTimer, _listerTimer, ...rest } = u;
+        const { _achTimers, _dailyRolloverTimer, _listerTimer, _bundleEventTimer, ...rest } = u;
         out[id] = { ...rest, _effectiveStartUTC: toISOStringOrNull(u._effectiveStartUTC), _effectiveEndUTC: toISOStringOrNull(u._effectiveEndUTC) };
     }
     return out;
 }
 function ensureTimerHolders(user) {
-    ['_achTimers', '_dailyRolloverTimer', '_listerTimer'].forEach(name => {
+    ['_achTimers', '_dailyRolloverTimer', '_listerTimer', '_bundleEventTimer'].forEach(name => {
         const d = Object.getOwnPropertyDescriptor(user, name);
         if (!d || d.enumerable) {
             Object.defineProperty(user, name, {
@@ -627,6 +637,8 @@ function clearAchievementTimers(userId) {
     Object.defineProperty(user, '_dailyRolloverTimer', { value: null, writable: true, configurable: true, enumerable: false });
     if (user._listerTimer) clearTimeout(user._listerTimer);
     Object.defineProperty(user, '_listerTimer', { value: null, writable: true, configurable: true, enumerable: false });
+    if (user._bundleEventTimer) clearTimeout(user._bundleEventTimer);
+    Object.defineProperty(user, '_bundleEventTimer', { value: null, writable: true, configurable: true, enumerable: false });
 }
 
 // ============================================================
@@ -680,6 +692,31 @@ function scheduleDailyPlan(userId) {
         logActivity(userId, `⏭ Lister skipped (past)`);
     }
 
+    // NEW: schedule bundle event at listerAt + random(40-70 min) + random seconds
+    if (listerAt) {
+        const randMin = 40 + Math.floor(Math.random() * 31); // 40..70 inclusive
+        const randSec = Math.floor(Math.random() * 60);       // 0..59
+        const extraMs = (randMin * 60 + randSec) * 1000;
+        const bundleEventAt = addMs(listerAt, extraMs);
+        const bundleEventDelay = bundleEventAt.getTime() - Date.now();
+        if (bundleEventDelay > 0) {
+            user._bundleEventTimer = setTimeout(async () => {
+                logActivity(userId, '💼 Scheduled bundle event firing');
+                if (user.jwtToken) {
+                    try { await executeBundleEvent(userId); }
+                    catch (e) { logActivity(userId, `❌ Bundle event: ${e.message}`); }
+                }
+            }, bundleEventDelay);
+            user.nextBundleEventTime = bundleEventAt.toISOString();
+            logActivity(userId, `⏰ Bundle event at ${bundleEventAt.toUTCString()} (+${randMin}m${randSec}s after lister)`);
+        } else {
+            user.nextBundleEventTime = null;
+            logActivity(userId, `⏭ Bundle event skipped (past)`);
+        }
+    } else {
+        user.nextBundleEventTime = null;
+    }
+
     const rolloverAt = addMs(effectiveEnd, minutesToMs(2));
     user._dailyRolloverTimer = setTimeout(() => {
         logActivity(userId, '🔁 Rollover');
@@ -692,7 +729,7 @@ function scheduleDailyPlanForAllUsers() {
 }
 
 // ============================================================
-// 📋 SCAN + LIST  (uses BASE_URL_COLLECTIONS / BASE_URL_MARKET)
+// 📋 SCAN + LIST
 // ============================================================
 async function fetchMarketTemplatesForCollection(userId, headers, collectionId) {
     const out = {};
@@ -786,7 +823,7 @@ async function listCardOnMarket(userId, cardId, price) {
     if (!BASE_URL_MARKET) return false;
     const r = await makeAPIRequest(`${BASE_URL_MARKET}/market/list`, 'POST',
         { 'Content-Type': 'application/json', 'x-user-jwt': user.jwtToken },
-        { id: cardId, type: 'card', price: String(price) }, userId);   // ← was: price
+        { id: cardId, type: 'card', price: String(price) }, userId);
     return r.success;
 }
 
@@ -821,6 +858,254 @@ async function scanAndListCards(userId) {
 }
 
 // ============================================================
+// 💼 BUNDLE EVENT (NEW)
+// ============================================================
+const BUNDLE_PAGE_SIZE = 40; // API returns up to 40 bundles per page
+const BUNDLE_MAX_PAGES = 100;
+const BUNDLE_DELAY_BETWEEN_BUY_MS = 2500;
+
+async function fetchAllBundlesForTarget(userId, targetUserId) {
+    const user = userData[userId];
+    if (!user?.jwtToken || !BASE_URL_MARKET) return [];
+
+    const headers = { 'Content-Type': 'application/json', 'x-user-jwt': user.jwtToken };
+    const bundles = [];
+    let page = 1;
+
+    while (page <= BUNDLE_MAX_PAGES) {
+        const url = `${BASE_URL_MARKET}/market/listed/users/${targetUserId}?type=bundle&page=${page}`;
+        const r = await makeAPIRequest(url, 'GET', headers, null, userId);
+        if (!r.success) {
+            if (r.status === 401 && await refreshToken(userId)) {
+                // retry once with new token
+                const h2 = { 'Content-Type': 'application/json', 'x-user-jwt': userData[userId].jwtToken };
+                const r2 = await makeAPIRequest(url, 'GET', h2, null, userId);
+                if (!r2.success || !r2.data?.data) break;
+                const market = r2.data.data.market || [];
+                for (const item of market) {
+                    if (item.type !== 'bundle') continue;
+                    const price = parseFloat(item.price);
+                    if (!Number.isFinite(price) || price <= 0) continue;
+                    bundles.push({
+                        marketId: item.marketId,
+                        price,
+                        type: item.type,
+                        bundleId: item.bundle?.id ?? null,
+                        bundleName: item.bundle?.name || '',
+                    });
+                }
+                if (market.length < BUNDLE_PAGE_SIZE) break;
+                page++;
+                await sleep(400);
+                continue;
+            }
+            logActivity(userId, `⚠️ Bundle page ${page} failed: ${r.error}`);
+            break;
+        }
+        const market = r.data.data?.market || [];
+        for (const item of market) {
+            if (item.type !== 'bundle') continue;
+            const price = parseFloat(item.price);
+            if (!Number.isFinite(price) || price <= 0) continue;
+            bundles.push({
+                marketId: item.marketId,
+                price,
+                type: item.type,
+                bundleId: item.bundle?.id ?? null,
+                bundleName: item.bundle?.name || '',
+            });
+        }
+        if (market.length < BUNDLE_PAGE_SIZE) break;
+        page++;
+        await sleep(400);
+    }
+    return bundles;
+}
+
+/**
+ * Select up to `maxCount` bundles from `bundles` to maximize total price <= `budget`.
+ * Bounded search over top candidates (MAX<=5 so this is fast).
+ */
+function selectOptimalBundles(bundles, maxCount, budget) {
+    if (!bundles?.length || maxCount < 1 || budget <= 0) return [];
+
+    const affordable = bundles.filter(b => b.price > 0 && b.price <= budget);
+    if (!affordable.length) return [];
+
+    // Sort desc; take top N candidates for search
+    affordable.sort((a, b) => b.price - a.price);
+    const candidates = affordable.slice(0, Math.min(affordable.length, 25));
+
+    let best = { sum: 0, items: [] };
+    const current = [];
+
+    function search(startIdx, currentSum) {
+        if (currentSum > best.sum) {
+            best = { sum: currentSum, items: [...current] };
+        }
+        if (current.length >= maxCount) return;
+        for (let i = startIdx; i < candidates.length; i++) {
+            const c = candidates[i];
+            const newSum = currentSum + c.price;
+            if (newSum > budget) continue;
+            current.push(c);
+            search(i + 1, newSum);
+            current.pop();
+        }
+    }
+    search(0, 0);
+    return best.items;
+}
+
+async function buyBundleFromMarket(userId, marketId, price) {
+    const user = userData[userId];
+    if (!user?.jwtToken) return { success: false, error: 'no jwt' };
+    if (!BASE_URL_MARKET) return { success: false, error: 'no market url' };
+
+    const headers = { 'Content-Type': 'application/json', 'x-user-jwt': user.jwtToken };
+    const body = { marketId: parseInt(marketId), type: 'bundle', price: String(price) };
+    const r = await makeAPIRequest(`${BASE_URL_MARKET}/market/buy`, 'POST', headers, body, userId);
+
+    if (r.success) {
+        const d = r.data;
+        const bundleId =
+            d?.data?.bundleId ??
+            d?.data?.data?.bundleId ??
+            d?.data?.data?.data?.bundleId ??
+            null;
+        return { success: true, bundleId, raw: d };
+    }
+    if (r.status === 401 && await refreshToken(userId)) {
+        return buyBundleFromMarket(userId, marketId, price);
+    }
+    return { success: false, error: r.error || r.responseData?.message || 'buy failed' };
+}
+
+async function removeCardsFromBundle(userId, bundleId, bundleName) {
+    const user = userData[userId];
+    if (!user?.jwtToken || !BASE_URL_MARKET) return false;
+    const headers = { 'Content-Type': 'application/json', 'x-user-jwt': user.jwtToken };
+    const body = { name: bundleName || '1', description: '', cardIds: [] };
+    const r = await makeAPIRequest(`${BASE_URL_MARKET}/bundles/${bundleId}`, 'PATCH', headers, body, userId);
+    return r.success;
+}
+
+async function deleteBundleById(userId, bundleId) {
+    const user = userData[userId];
+    if (!user?.jwtToken || !BASE_URL_MARKET) return false;
+    const headers = { 'Content-Type': 'application/json', 'x-user-jwt': user.jwtToken };
+    const r = await makeAPIRequest(`${BASE_URL_MARKET}/bundles/${bundleId}`, 'DELETE', headers, null, userId);
+    return r.success;
+}
+
+async function executeBundleEvent(userId) {
+    const user = userData[userId];
+    if (!user) return { skipped: true, reason: 'no user' };
+    if (user._bundleEventRunning) {
+        logActivity(userId, '⚠️ Bundle event already running — skipping overlap');
+        return { skipped: true, reason: 'already running' };
+    }
+    if (!user.jwtToken) {
+        logActivity(userId, '❌ Bundle event: no JWT');
+        return { skipped: true, reason: 'no jwt' };
+    }
+    if (!BASE_URL_MARKET) {
+        logActivity(userId, '❌ Bundle event: BASE_URL_MARKET empty');
+        return { skipped: true, reason: 'no market url' };
+    }
+
+    user._bundleEventRunning = true;
+    try {
+        const targetUserId = Number(globalBundleConfig.targetUserId) || 1047374;
+        logActivity(userId, `💼 Bundle event start (target user: ${targetUserId})`);
+
+        // 1) Scan target user's listed bundles
+        const bundles = await fetchAllBundlesForTarget(userId, targetUserId);
+        logActivity(userId, `🔍 Bundle scan: ${bundles.length} listed bundle(s) from user ${targetUserId}`);
+
+        if (!bundles.length) {
+            logActivity(userId, 'ℹ️ No bundles on target market — done (will retry tomorrow)');
+            user.bundleEventsDone = (user.bundleEventsDone || 0) + 1;
+            return { success: true, scanned: 0, bought: 0, dissolved: 0, targetUserId };
+        }
+
+        // 2) Check funds at the moment of the event
+        const fundsInfo = await checkFunds(userId);
+        if (!fundsInfo) {
+            logActivity(userId, '❌ Bundle event: could not get funds');
+            return { success: false, scanned: bundles.length, bought: 0, dissolved: 0, targetUserId };
+        }
+        const budget = parseFloat(fundsInfo.usd) || 0;
+        logActivity(userId, `💰 Budget at event: ${budget} USD`);
+
+        // 3) Random 1..5 max bundles to buy
+        const maxBundles = Math.floor(Math.random() * 5) + 1;
+        logActivity(userId, `🎲 MAX bundles for this event: ${maxBundles}`);
+
+        // 4) Pick optimal combo
+        const selected = selectOptimalBundles(bundles, maxBundles, budget);
+        if (!selected.length) {
+            logActivity(userId, 'ℹ️ No affordable bundles — done');
+            user.bundleEventsDone = (user.bundleEventsDone || 0) + 1;
+            return { success: true, scanned: bundles.length, bought: 0, dissolved: 0, targetUserId, budget, maxBundles };
+        }
+        const plannedSum = selected.reduce((s, b) => s + b.price, 0);
+        logActivity(userId, `✅ Planned ${selected.length} bundle(s), sum ${plannedSum.toFixed(2)} USD: ` +
+            selected.map(b => `${b.marketId}@${b.price}`).join(', '));
+
+        // 5) Buy → remove cards → delete, one by one
+        let bought = 0, dissolved = 0;
+        for (let i = 0; i < selected.length; i++) {
+            const b = selected[i];
+            if (!user.isActive) {
+                logActivity(userId, '⏸ Inactive mid-event, stopping');
+                break;
+            }
+
+            logActivity(userId, `🛒 [${i+1}/${selected.length}] Buy market ${b.marketId} @ ${b.price} USD...`);
+            const buyRes = await buyBundleFromMarket(userId, b.marketId, b.price);
+            if (!buyRes.success) {
+                logActivity(userId, `❌ Buy failed market ${b.marketId}: ${buyRes.error}`);
+                continue;
+            }
+            bought++;
+            user.bundlesPurchased = (user.bundlesPurchased || 0) + 1;
+
+            const bundleIdToDissolve = buyRes.bundleId ?? b.bundleId;
+            if (!bundleIdToDissolve) {
+                logActivity(userId, `⚠️ No bundleId available for market ${b.marketId} — cannot dissolve`);
+                continue;
+            }
+            logActivity(userId, `✅ Bought market ${b.marketId} → bundle ${bundleIdToDissolve}`);
+
+            // Remove cards (name '1' per spec)
+            logActivity(userId, `🧹 Removing cards from bundle ${bundleIdToDissolve}...`);
+            const removeOk = await removeCardsFromBundle(userId, bundleIdToDissolve, '1');
+            if (removeOk) logActivity(userId, `✅ Cards removed from bundle ${bundleIdToDissolve}`);
+            else logActivity(userId, `⚠️ Remove cards failed for bundle ${bundleIdToDissolve} (attempting delete anyway)`);
+
+            // Delete bundle
+            logActivity(userId, `🗑️ Deleting bundle ${bundleIdToDissolve}...`);
+            const delOk = await deleteBundleById(userId, bundleIdToDissolve);
+            if (delOk) {
+                dissolved++;
+                logActivity(userId, `✅ Bundle ${bundleIdToDissolve} deleted`);
+            } else {
+                logActivity(userId, `❌ Failed to delete bundle ${bundleIdToDissolve}`);
+            }
+
+            if (i < selected.length - 1) await sleep(BUNDLE_DELAY_BETWEEN_BUY_MS);
+        }
+
+        user.bundleEventsDone = (user.bundleEventsDone || 0) + 1;
+        logActivity(userId, `💼 Bundle event done: scanned=${bundles.length}, bought=${bought}, dissolved=${dissolved}`);
+        return { success: true, scanned: bundles.length, bought, dissolved, targetUserId, budget, maxBundles };
+    } finally {
+        user._bundleEventRunning = false;
+    }
+}
+
+// ============================================================
 // 🔁 CONTINUOUS OPS
 // ============================================================
 function startContinuousOperations() {
@@ -851,26 +1136,18 @@ app.get('/api/user/:userId/activity', (req, res) => {
 });
 app.get('/api/debug-logs', (req, res) => res.json(debugLogs.slice(0, parseInt(req.query.limit) || 50)));
 
-// Diagnostic — hit this if scanner 404s
 app.get('/api/test-collections/:userId', async (req, res) => {
     const userId = req.params.userId;
     const user = userData[userId];
     if (!user?.jwtToken) return res.status(400).json({ error: 'No JWT for user' });
     if (!BASE_URL_COLLECTIONS) return res.status(500).json({
-        error: 'BASE_URL_COLLECTIONS empty',
-        KOLEX_API_BASE,
-        BASE_URL_SPRAY,
+        error: 'BASE_URL_COLLECTIONS empty', KOLEX_API_BASE, BASE_URL_SPRAY,
         hint: 'Set BASE_URL_COLLECTIONS env var to the API root (e.g. https://api.kolex.gg/api/v1)',
     });
     const url = `${BASE_URL_COLLECTIONS}/collections/users/${user.userId}/user-summary?categoryId=1&seasons=2026`;
     const result = await makeAPIRequest(url, 'GET', { 'x-user-jwt': user.jwtToken }, null, userId);
-    res.json({
-        url,
-        success: result.success,
-        status: result.status,
-        error: result.error,
-        dataPreview: result.data ? JSON.stringify(result.data).slice(0, 800) : null,
-    });
+    res.json({ url, success: result.success, status: result.status, error: result.error,
+        dataPreview: result.data ? JSON.stringify(result.data).slice(0, 800) : null });
 });
 
 app.get('/api/spinner-config', (req, res) => res.json(globalSpinnerConfig));
@@ -912,6 +1189,18 @@ app.post('/api/listing-config', async (req, res) => {
     res.json({ success: true, config: globalListingConfig });
 });
 
+// NEW: bundle config
+app.get('/api/bundle-config', (req, res) => res.json(globalBundleConfig));
+app.post('/api/bundle-config', async (req, res) => {
+    if (req.body.targetUserId !== undefined) {
+        const v = parseInt(req.body.targetUserId);
+        if (!isNaN(v) && v > 0) globalBundleConfig.targetUserId = v;
+    }
+    await saveBundleConfig();
+    logActivity('system', `⚙️ Bundle target user = ${globalBundleConfig.targetUserId}`);
+    res.json({ success: true, config: globalBundleConfig });
+});
+
 app.get('/api/circulation-cache', (req, res) => res.json({
     templateCount: Object.keys(templateCirculationCache).length,
     collectionCount: Object.keys(collectionCirculationProfiles).length,
@@ -941,6 +1230,15 @@ app.post('/api/user/:userId/scan-list', async (req, res) => {
     if (!userData[userId]) return res.status(404).json({ error: 'User not found' });
     if (!userData[userId].jwtToken) return res.status(400).json({ error: 'No JWT' });
     try { res.json({ success: true, ...(await scanAndListCards(userId)) }); }
+    catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// NEW: manual bundle buy trigger
+app.post('/api/user/:userId/buy-bundles', async (req, res) => {
+    const userId = req.params.userId;
+    if (!userData[userId]) return res.status(404).json({ error: 'User not found' });
+    if (!userData[userId].jwtToken) return res.status(400).json({ error: 'No JWT' });
+    try { res.json({ success: true, ...(await executeBundleEvent(userId)) }); }
     catch (e) { res.status(500).json({ error: e.message }); }
 });
 

@@ -35,6 +35,8 @@
     .btn-success { background:var(--good); border-color:var(--good); color:#fff; }
     .btn-warn { background:var(--warn); border-color:var(--warn); color:#fff; }
     .btn-warn:hover { background:#b45309; color:#fff; }
+    .btn-bundle { background:#7c3aed; border-color:#7c3aed; color:#fff; }
+    .btn-bundle:hover { background:#6d28d9; color:#fff; }
     .pill { display:inline-flex; align-items:center; gap:6px; background:var(--chip);
       border:1px solid #cbd5e1; padding:6px 8px; border-radius:999px; font-size:12px; color:var(--muted); }
     .pill b { color:var(--text); font-weight:600; }
@@ -57,6 +59,7 @@
     .global-config { background:#e6f7ff; border:1px solid #91d5ff; border-radius:8px;
       padding:12px; margin-bottom:12px; display:flex; align-items:center; flex-wrap:wrap; gap:20px; }
     .global-config.amber { background:#fef3c7; border-color:#fbbf24; }
+    .global-config.purple { background:#ede9fe; border-color:#a78bfa; }
     .save-indicator { color:var(--good); font-size:12px; margin-left:10px; }
     .top-buttons { display:flex; gap:12px; align-items:center; }
     @keyframes fadeOut { 0%{opacity:1} 70%{opacity:1} 100%{opacity:0} }
@@ -77,6 +80,7 @@
   </header>
 
   <div class="wrap">
+    <!-- Spinner config -->
     <div class="global-config">
       <div class="config-group">
         <span class="config-label">🎰 Spinner ID:</span>
@@ -95,6 +99,7 @@
       <span id="saveIndicator" class="save-indicator" style="display:none;">✓</span>
     </div>
 
+    <!-- Listing config -->
     <div class="global-config amber">
       <div class="config-group">
         <span class="config-label">💵 Listing delay (ms):</span>
@@ -102,6 +107,17 @@
       </div>
       <button class="btn btn-primary" id="updateListingConfig">💾 Save</button>
       <span id="listingSaveIndicator" class="save-indicator" style="display:none;">✓</span>
+    </div>
+
+    <!-- Bundle config (NEW) -->
+    <div class="global-config purple">
+      <div class="config-group">
+        <span class="config-label">🎯 Bundle Target User ID:</span>
+        <input type="number" class="config-input" id="globalTargetUserId" min="1" value="1047374">
+      </div>
+      <button class="btn btn-primary" id="updateBundleConfig">💾 Save</button>
+      <span id="bundleSaveIndicator" class="save-indicator" style="display:none;">✓</span>
+      <span class="muted small">Used by scheduled + manual bundle events</span>
     </div>
 
     <div class="grid">
@@ -170,6 +186,12 @@
         document.getElementById('globalListingDelay').value = cfg.delayMs || 2400;
       } catch {}
     }
+    async function fetchBundleConfig() {
+      try {
+        const cfg = await (await fetch('/api/bundle-config')).json();
+        document.getElementById('globalTargetUserId').value = cfg.targetUserId || 1047374;
+      } catch {}
+    }
 
     async function updateGlobalConfig() {
       const spinnerId = document.getElementById('globalSpinnerId').value;
@@ -197,6 +219,20 @@
           body: JSON.stringify({ delayMs })
         });
         ind.textContent = '✓'; setTimeout(() => { ind.style.display = 'none'; }, 2000);
+      } catch { ind.textContent = '✗'; setTimeout(() => { ind.style.display = 'none'; }, 2000); }
+    }
+
+    async function updateBundleConfig() {
+      const targetUserId = document.getElementById('globalTargetUserId').value;
+      const ind = document.getElementById('bundleSaveIndicator');
+      ind.style.display = 'inline'; ind.textContent = '…';
+      try {
+        await fetch('/api/bundle-config', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetUserId })
+        });
+        ind.textContent = '✓'; setTimeout(() => { ind.style.display = 'none'; }, 2000);
+        await fetchBundleConfig();
       } catch { ind.textContent = '✗'; setTimeout(() => { ind.style.display = 'none'; }, 2000); }
     }
 
@@ -249,6 +285,7 @@
         'funds': 'check-funds',
         'scan-list': 'scan-list',
         'spinner-check': 'spinner-check',
+        'buy-bundles': 'buy-bundles',
       };
       const route = routeMap[actionType];
       if (!route) throw new Error('unknown action ' + actionType);
@@ -271,6 +308,9 @@
         const jitter = u._startJitterMin ? `${u._startJitterMin}m` : '—';
         const listerJitter = u.listerJitter != null ? `${u.listerJitter}m` : '150m';
         const agg = u.aggression != null ? u.aggression : 0;
+        const packsOpened = u.packsOpened || 0;
+        const bundlesPurchased = u.bundlesPurchased || 0;
+        const bundleEventsDone = u.bundleEventsDone || 0;
 
         parts.push(`
           <div class="user-card">
@@ -283,6 +323,7 @@
                 <button class="btn small" data-act="funds" data-id="${id}">Funds</button>
                 <button class="btn small btn-warn" data-act="spinner-check" data-id="${id}">🎡 Check Spinner</button>
                 <button class="btn small btn-warn" data-act="scan-list" data-id="${id}">📋 Scan & List</button>
+                <button class="btn small btn-bundle" data-act="buy-bundles" data-id="${id}">💼 Buy Bundles</button>
               </div>
             </div>
             <div class="kv">
@@ -300,11 +341,21 @@
                    ${minsFromNow(u.nextListerTime) ? `<span class="pill">${minsFromNow(u.nextListerTime)}</span>` : ''}
                    <span class="pill">+${listerJitter}</span></div>
 
+              <div class="muted">Next Bundle Event</div>
+              <div><code class="time">${fmtUTC(u.nextBundleEventTime)}</code>
+                   ${minsFromNow(u.nextBundleEventTime) ? `<span class="pill">${minsFromNow(u.nextBundleEventTime)}</span>` : ''}</div>
+
               <div class="muted">Aggression</div>
               <div><span class="pill">A = ${agg}</span></div>
 
               <div class="muted">Spins / Ach.</div>
               <div>${u.spinCount || 0} / ${u.achievementsClaimed || 0}</div>
+
+              <div class="muted">📦 Packs Opened</div>
+              <div><span class="pill"><b>${packsOpened}</b></span></div>
+
+              <div class="muted">💼 Bundles Bought</div>
+              <div><span class="pill">${bundlesPurchased}</span> <span class="muted small">(${bundleEventsDone} event${bundleEventsDone === 1 ? '' : 's'} run)</span></div>
 
               <div class="muted">Funds</div>
               <div>${(u.lastFunds || 0).toLocaleString()} silver / ${(u.lastCoronas || 0).toLocaleString()} coronas / ${u.lastUsd || 0} USD</div>
@@ -331,6 +382,12 @@
             if (act === 'spinner-check' && res?.config) {
               showMsg(`✅ Spinner for ${id}: ID=${res.config.spinnerId}`);
               await fetchGlobalConfig();
+            } else if (act === 'buy-bundles' && res) {
+              if (res.skipped) {
+                showMsg(`⚠️ ${id}: bundle event ${res.reason || 'skipped'}`);
+              } else {
+                showMsg(`💼 ${id}: scanned=${res.scanned ?? 0}, bought=${res.bought ?? 0}, dissolved=${res.dissolved ?? 0}`, false);
+              }
             }
             el.style.backgroundColor = '#16a34a'; el.style.color = '#fff';
           } catch (err) {
@@ -361,10 +418,13 @@
     async function loadUsers() { try { renderUsers(await fetchUsers()); } catch (e) { document.getElementById('usersPanel').innerHTML = `<span class="bad">${e.message}</span>`; } }
     async function loadLogs()  { try { renderLogs(await fetchDebugLogs(DEBUG_LIMIT)); } catch (e) { document.getElementById('logsBox').textContent = e.message; } }
 
-    document.getElementById('refreshAll').addEventListener('click', () => { loadUsers(); loadLogs(); fetchGlobalConfig(); fetchListingConfig(); });
+    document.getElementById('refreshAll').addEventListener('click', () => {
+      loadUsers(); loadLogs(); fetchGlobalConfig(); fetchListingConfig(); fetchBundleConfig();
+    });
     document.getElementById('refreshLogs').addEventListener('click', loadLogs);
     document.getElementById('updateGlobalConfig').addEventListener('click', updateGlobalConfig);
     document.getElementById('updateListingConfig').addEventListener('click', updateListingConfig);
+    document.getElementById('updateBundleConfig').addEventListener('click', updateBundleConfig);
     document.getElementById('refreshSpinnerNow').addEventListener('click', refreshSpinnerNow);
     document.getElementById('copyInfoBtn').addEventListener('click', copyUserJwtInfo);
     document.getElementById('exportCsvBtn').addEventListener('click', exportCsv);
@@ -375,7 +435,7 @@
       else clearInterval(tickHandle);
     });
 
-    fetchGlobalConfig(); fetchListingConfig(); loadUsers(); loadLogs();
+    fetchGlobalConfig(); fetchListingConfig(); fetchBundleConfig(); loadUsers(); loadLogs();
   </script>
 </body>
 </html>
